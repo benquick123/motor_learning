@@ -4,10 +4,13 @@ from vicon_dssdk import ViconDataStream
 
 class ViconClient:
     
-    def __init__(self, address="localhost", port=801):
+    def __init__(self, subject_name="teast_3_m", segment_name="teast_3_m", address="localhost", port=801):
         self.address = address
         self.port = port
         self.client = ViconDataStream.Client()
+
+        self.subject_name = subject_name
+        self.segment_name = segment_name
         
     def init_connection(self, client):
         client.Connect(self.address + ":" + str(self.port))
@@ -32,26 +35,21 @@ class ViconClient:
         # print("Get Frame Push", client.GetFrame(), client.GetFrameNumber())
 
     def get_current_position_data(self):
-        HasFrame = False
-        while not HasFrame:
+        has_frame = False
+        while not has_frame:
             try:
                 self.client.GetFrame()
-                HasFrame = True
+                has_frame = True
             except ViconDataStream.DataStreamException as e:
                 print(f"Error: '{str(e)}' ")
-            
-        # Get the segment data
-        subjectName = 'teast_3_m'
-        segmentName = 'teast_3_m'
 
-        segment_data = self.client.GetSegmentGlobalTranslation(subjectName, segmentName)
+        segment_data = self.client.GetSegmentGlobalTranslation(self.subject_name, self.segment_name)
                                 
         # Access each vector in function
         # Nexus by default returns position value in mm !!!
         marker_x_axis_m = segment_data[0][0] / 1000
         marker_y_axis_m = -segment_data[0][1] / 1000
         marker_z_axis_m = segment_data[0][2] / 1000
-
 
         return marker_x_axis_m, marker_y_axis_m, marker_z_axis_m
            
