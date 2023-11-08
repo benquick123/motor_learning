@@ -18,7 +18,6 @@ def initialize_state_dict(experiment_config):
     state_dict["frequency"] = experiment_config["refresh_frequency"]
     state_dict["force_amplification"] = experiment_config["experiment"]["force_amplification"]
     state_dict["total_time"] = experiment_config["experiment"]["total_time"]
-    # TODO: probably random time in some interval should be used.
     state_dict["state_wait_time"] = experiment_config["experiment"]["state_wait_time"]
     
     state_dict["current_force_amplification"] = 0
@@ -43,12 +42,11 @@ if __name__ == "__main__":
     
     # vicon_client = ViconClient()
     # controller = MotorController()
-    interface = Interface()
+    interface = Interface(display_number=0)
     state_machine = StateMachine()
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=args.no_log)
     
     logger.save_experiment_config(experiment_config)
-    exit()
     
     continue_loop = True
     

@@ -12,8 +12,9 @@ class Logger:
         
         if not self.no_log:
             os.makedirs(self.results_path, exist_ok=True)
-            os.makedirs(os.path.join(self.results_path, self.participant_folder))
+            os.makedirs(os.path.join(self.results_path, self.participant_folder), exist_ok=False)
     
     def save_experiment_config(self, experiment_config):
         if not self.no_log:
             json.dump(experiment_config, open(os.path.join(self.results_path, self.participant_folder, "experiment_config.json"), "w"), indent=4, sort_keys=True)
+        

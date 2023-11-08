@@ -29,7 +29,6 @@ class Interface:
         self.main_circle_buffer = []
     
     def update(self, state_dict):
-        # TODO: update the sizes (magic numbers below) to correspond to whatever is measured on the screen.
         if "main_circle_position" not in state_dict:
             state_dict["main_circle_radius"] = (0.015 * self.window_width)
             state_dict["main_circle_color"] = Colors.WHITE
