@@ -10,6 +10,7 @@ class Colors:
     DARK_GREEN = (0, 150, 0)
     BLACK = (0, 0, 0)
     RED = (204, 0, 51)
+    LIGHT_GRAY = (224, 224, 224)
 
 class Interface:
     
@@ -33,7 +34,7 @@ class Interface:
             state_dict["main_circle_radius"] = (0.015 * self.window_width)
             state_dict["main_circle_color"] = Colors.WHITE
         if "start_circle_position" not in state_dict:
-            state_dict["start_circle_position"] = np.array([self.window_width / 5, self.window_height / 2])
+            state_dict["start_circle_position"] = np.array([self.window_width / 2, self.window_height / 2])
             state_dict["start_circle_radius"] = 0.025 * self.window_width
             state_dict["start_circle_color"] = Colors.WHITE
         if "terminal_circle_position" not in state_dict:

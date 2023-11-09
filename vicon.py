@@ -17,6 +17,8 @@ class ViconClient:
         self.prev_marker_position = np.ones(3) * np.nan
         self.prev_time = None
         
+        self.init_connection(self.client)
+        
     def init_connection(self, client):
         client.Connect(self.address + ":" + str(self.port))
         

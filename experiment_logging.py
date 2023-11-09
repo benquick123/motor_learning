@@ -18,3 +18,10 @@ class Logger:
         if not self.no_log:
             json.dump(experiment_config, open(os.path.join(self.results_path, self.participant_folder, "experiment_config.json"), "w"), indent=4, sort_keys=True)
         
+    def save_trajectory(self, trajectory_data):
+        if not self.no_log:
+            pass
+    
+    def merge_trajectories(self):
+        if not self.no_log:
+            pass
