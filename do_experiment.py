@@ -92,11 +92,10 @@ if __name__ == "__main__":
             logger.save_datapoint(state_dict)
             
             # calculate time and optionally wait
-            time_end = time()
-            if time_end - time_start > (1 / state_dict["frequency"]):
-                print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time_end - time_start, state_dict["frequency"]))
+            if time() - time_start > (1 / state_dict["frequency"]):
+                print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, state_dict["frequency"]))
             else:
-                sleep((1 / state_dict["frequency"]) - (time_end - time_start))
+                sleep((1 / state_dict["frequency"]) - (time() - time_start))
                 
     except Exception:
         print(traceback.format_exc())

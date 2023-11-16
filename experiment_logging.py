@@ -36,7 +36,7 @@ class Logger:
     
         if os.path.exists(os.path.join(self.results_path, self.participant_folder, "experiment_data.tsv")):
             print(f"Experiment data file for participant #{self.participant_id} already exists!")
-            answer = input("Overwrite? (y/n)")
+            answer = input("Overwrite? (y/n) ")
             if answer != "y":
                 exit()
         
@@ -71,7 +71,21 @@ class Logger:
         if not self.no_log:
             if os.path.exists(os.path.join(self.results_path, self.participant_folder, "experiment_config.json")):
                 print(f"Experiment config for participant #{self.participant_id} already exists!")
+                answer = input("Overwrite? (y/n) ")
+                if answer != "y":
+                    exit()
+                    
             json.dump(experiment_config, open(os.path.join(self.results_path, self.participant_folder, "experiment_config.json"), "w"), indent=4, sort_keys=True)
+        
+    def save_fsl(self, fsl_dict):
+        if not self.no_log:
+            if os.path.exists(os.path.join(self.results_path, self.participant_folder, "participant_fsl.json")):
+                print(f"Functional Stability Limits for participant #{self.participant_id} already exist!")
+                answer = input("Overwrite? (y/n) ")
+                if answer != "y":
+                    exit()
+                    
+            json.dump(fsl_dict, open(os.path.join(self.results_path, self.participant_folder, "participant_fsl.json"), "w"), indent=4, sort_keys=True)
         
     def close(self):
         self.trajectory_file.close()
