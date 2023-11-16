@@ -16,6 +16,11 @@ class StateMachine:
     
     def __init__(self):
         self.current_state = None
+        self.prev_main_circle_position = None
+        
+        # construct reverse state lookup
+        all_variables = vars(StateMachine)
+        self.reverse_state_lookup = {all_variables[name]: name for name in all_variables if isinstance(all_variables[name], int) and name.isupper()}
     
     def maybe_update_state(self, state_dict):
         continue_loop = True
@@ -59,7 +64,12 @@ class StateMachine:
                 self.set_trial_termination(state_dict)
             elif state_dict["main_circle_position"][0] > state_dict["terminal_circle_position"][0]:
                 self.current_state = StateMachine.TRIAL_TERMINATION
-                self.set_unsuccessful_trial(state_dict)
+                
+                if self._get_line_distance_to_center(self.prev_main_circle_position, state_dict["main_circle_position"], state_dict["terminal_circle_position"]) < state_dict["terminal_circle_radius"]:
+                    self.set_successful_trial(state_dict)
+                else:
+                    self.set_unsuccessful_trial(state_dict)
+                
                 self.set_trial_termination(state_dict)
                 
         elif self.current_state == StateMachine.TRIAL_TERMINATION:
@@ -70,16 +80,26 @@ class StateMachine:
         elif self.current_state == StateMachine.EXIT:
             if state_dict["enter_pressed"]:
                 continue_loop = False
-            
                 
-        state_dict["remaining_time"] = np.clip(state_dict["remaining_time"], a_min=0, a_max=state_dict["total_time"])
+        state_dict["remaining_time"] = float(np.clip(state_dict["remaining_time"], a_min=0, a_max=state_dict["total_time"]))
         state_dict["remaining_time_perc"] = state_dict["remaining_time"] / state_dict["total_time"]
+        state_dict["current_state"] = self.reverse_state_lookup[self.current_state]
         
         if state_dict["remaining_time"] == 0:
             self.current_state = StateMachine.EXIT
             self.set_exit(state_dict)
             
+        if "main_circle_position" in state_dict:
+            self.prev_main_circle_position = np.copy(state_dict["main_circle_position"])
+            
         return continue_loop, state_dict
+
+    def _get_line_distance_to_center(self, p0, p1, c):
+        # https://www.wikiwand.com/en/Distance_from_a_point_to_a_line#:~:text=horizontal%20line%20segment.-,Line%20defined%20by%20two%20points,-If%20the%20line
+
+        numerator = np.abs((p1[0] - p0[0]) * (p0[1] - c[1]) - (p0[0] - c[0]) * (p1[1] - p0[1]))
+        denominator = np.linalg.norm(p0 - p1)
+        return numerator / denominator
 
     def set_initial_screen(self, state_dict):
         state_dict["state_start_time"] = None
