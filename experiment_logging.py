@@ -86,6 +86,16 @@ class Logger:
                     exit()
                     
             json.dump(fsl_dict, open(os.path.join(self.results_path, self.participant_folder, "participant_fsl.json"), "w"), indent=4, sort_keys=True)
+            
+    def save_com(self, com_dict):
+        if not self.no_log:
+            if os.path.exists(os.path.join(self.results_path, self.participant_folder, "participant_com.json")):
+                print(f"Functional Stability Limits for participant #{self.participant_id} already exist!")
+                answer = input("Overwrite? (y/n) ")
+                if answer != "y":
+                    exit()
+                    
+            json.dump(com_dict, open(os.path.join(self.results_path, self.participant_folder, "participant_com.json"), "w"), indent=4, sort_keys=True)
         
     def close(self):
         self.trajectory_file.close()

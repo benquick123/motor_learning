@@ -43,7 +43,7 @@ if __name__ == "__main__":
     vicon_client = DummyClient()
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=False)
     
-    direction_dict = {0: "LEFT", 1: "RIGHT", 2: "FORWARD", 3: "BACKWARD", 4: "LEFT_45_DEG", 5: "RIGHT_45_DEG"}
+    direction_dict = {0: "left", 1: "right", 2: "forward", 3: "backward", 4: "left_45_deg", 5: "right_45_deg"}
     
     np.random.seed(42)
     max_distance = 0.02 # we allow max movement of 2 cm during measurements.
@@ -73,7 +73,10 @@ if __name__ == "__main__":
         all_datapoints.append(fsl_results[key])
         
     all_datapoints = np.stack(all_datapoints, axis=0)    
-    fsl_results["fsl_geom_mean"] = scipy.stats.gmean(all_datapoints, axis=0).tolist()
-    fsl_results["fsl_arith_mean"] = scipy.stats.tmean(all_datapoints, axis=0).tolist()
+    fsl_results["fsl_geom_mean"] = scipy.stats.gmean(all_datapoints, axis=0)
+    fsl_results["fsl_geom_mean"] = np.where(np.isnan(fsl_results["fsl_geom_mean"]), None, fsl_results["fsl_geom_mean"]).tolist()
+    
+    fsl_results["fsl_arith_mean"] = scipy.stats.tmean(all_datapoints, axis=0)
+    fsl_results["fsl_arith_mean"] = np.where(np.isnan(fsl_results["fsl_arith_mean"]), None, fsl_results["fsl_arith_mean"]).tolist()
     
     logger.save_fsl(fsl_results)
