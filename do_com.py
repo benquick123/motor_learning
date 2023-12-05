@@ -51,7 +51,7 @@ if __name__ == "__main__":
     max_distance = 0.02 # m
     
     while True:
-        input("Press <Enter> where ready to start recording.")
+        input("Press <Enter> when ready to start recording.")
         
         positions = record(2.0, vicon_client, frequency=experiment_config["refresh_frequency"])
         

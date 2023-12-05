@@ -55,7 +55,7 @@ if __name__ == "__main__":
     while fsl_idx < len(fsl_order):
         print(direction_dict[fsl_order[fsl_idx]])
         
-        input("Press <Enter> where ready to start recording.")
+        input("Press <Enter> when ready to start recording.")
         
         positions = record_one_direction(2.0, vicon_client, frequency=experiment_config["refresh_frequency"])
         positions_mean = positions.mean(axis=0)
