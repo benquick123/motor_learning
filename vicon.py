@@ -51,7 +51,9 @@ class ViconClient:
                 print(f"Error: '{str(e)}' ")
 
         segment_data = self.client.GetSegmentGlobalTranslation(self.subject_name, self.segment_name)
-                                
+        # segment_data = self.client.GetMarkerGlobalTranslation(self.subject_name, self.segment_name)
+        print(segment_data)
+        exit()               
         # Access each vector in function
         # Nexus by default returns position value in mm !!!
         marker_x_axis_m = segment_data[0][0] / 1000
@@ -70,4 +72,3 @@ class ViconClient:
         self.prev_time = current_time
         
         return velocity
-    
