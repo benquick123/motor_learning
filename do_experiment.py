@@ -8,8 +8,8 @@ import numpy as np
 import pygame
 
 from experiment_logging import Logger
-# from vicon import ViconClient
-# from controller import MotorController
+from vicon import ViconClient
+from controller import MotorController
 from interface import Interface
 from state_machine import StateMachine
 
