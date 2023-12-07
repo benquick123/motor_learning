@@ -7,7 +7,7 @@ from vicon_dssdk import ViconDataStream
 
 class ViconClient:
     
-    def __init__(self, subject_name="teast_3_m", address="localhost", port=801):
+    def __init__(self, subject_name="WholeBodyLearningExp", address="localhost", port=801):
         self.address = address
         self.port = port
         self.client = ViconDataStream.Client()
@@ -41,7 +41,7 @@ class ViconClient:
         # print("Get Frame Push", client.GetFrame(), client.GetFrameNumber())
 
     def get_current_position(self, name, mode="segment"):
-        assert mode in {"segment", "marker"}
+        assert mode in {"segment", "marker", "all_markers"}
         
         has_frame = False
         while not has_frame:
@@ -52,33 +52,31 @@ class ViconClient:
                 print(f"Error: '{str(e)}' ")
 
         if mode == "segment":
-            data = self.client.GetSegmentGlobalTranslation(self.subject_name, name)
+            segment_position = self.client.GetSegmentGlobalTranslation(self.subject_name, name)
             # ^we are only interested in the three coordinates returned here.
             # we want the middle of the segment
-                                
-            # Access each vector in function
-            # Nexus by default returns position value in mm !!!
-            marker_x_axis_m = data[0][0] / 1000
-            marker_y_axis_m = -data[0][1] / 1000
-            marker_z_axis_m = data[0][2] / 1000
-            
-            positions = np.array([marker_x_axis_m, marker_y_axis_m, marker_z_axis_m])
+            positions = np.array(segment_position[0]) / 1000
 
             return positions, time()
 
         elif mode == "marker":
-            data = self.client.GetMarkerGlobalTranslation(self.subject_name, name)
-            
-            # ˇThis needs to be tested and probably debugged.
-            marker_x_axis_m = data[0][0] / 1000
-            marker_y_axis_m = -data[0][1] / 1000
-            marker_z_axis_m = data[0][2] / 1000
-
-            positions = np.array([marker_x_axis_m, marker_y_axis_m, marker_z_axis_m])
+            marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, name)
+            positions = np.array(marker_position[0]) / 1000
 
             return positions, time()
+        
+        elif mode == "all_markers":
+            marker_names = self.client.GetMarkerNames(self.subject_name)
+            # marker_positions = self.client.GetLabeledMarkers()
+
+            positions = dict()
+            for marker_name in marker_names:
+                marker_name = marker_name[0]
+                marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, marker_name)
+                positions[marker_name] = np.array(marker_position[0]) / 1000
+            return positions, time()
+
             
-           
     def get_velocity(self, current_marker_position, current_time, name):
         if name not in self.prev_marker_positions:
             velocity = np.ones(3) * 0

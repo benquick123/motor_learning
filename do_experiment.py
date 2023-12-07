@@ -9,7 +9,7 @@ import pygame
 
 from experiment_logging import Logger
 from vicon import ViconClient
-from controller import MotorController
+# from controller import MotorController
 from interface import Interface
 from state_machine import StateMachine
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     experiment_config = json.load(open("experiment_config.json", "r"))
     state_dict = initialize_state_dict(experiment_config)
     
-    # vicon_client = ViconClient()
+    vicon_client = ViconClient()
     # controller = MotorController()
     interface = Interface()
     state_machine = StateMachine()
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             pygame.event.get()
             
             # get marker position
-            # marker_position, marker_timestamp = vicon_client.get_current_position()
+            marker_position, marker_timestamp = vicon_client.get_current_position()
             
             # calculate velocity
             # marker_velocity = vicon_client.get_velocity(marker_position, timestamp)
