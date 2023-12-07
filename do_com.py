@@ -15,7 +15,7 @@ from com_computation import compute_com, NOMINAL_HEIGHT
 class DummyClient:
     
     def __init__(self):
-        pass
+        np.random.seed(42)
     
     def get_current_position(self, name, mode=None):
         return np.random.normal(0, 0.001, size=(3, ))
@@ -58,7 +58,6 @@ if __name__ == "__main__":
     
     vicon_client = ViconClient()
     
-    np.random.seed(42)
     # max distance is the same as in FSL measurements.
     max_distance = 0.020 # m
     
