@@ -87,3 +87,22 @@ class ViconClient:
         self.prev_times[name] = current_time
         
         return velocity
+    
+    def get_center_of_pressure(self):
+        has_frame = False
+        while not has_frame:
+            try:
+                self.client.GetFrame()
+                has_frame = True
+            except ViconDataStream.DataStreamException as e:
+                print(f"Error: '{str(e)}' ")
+
+        cop0 = np.array(self.client.GetGlobalCenterOfPressure(1)).mean(axis=0)
+        cop1 = np.array(self.client.GetGlobalCenterOfPressure(2)).mean(axis=0)
+
+        force_vector_z0 = np.array(self.client.GetGlobalForceVector(1)).mean(axis=0)[2]
+        force_vector_z1 = np.array(self.client.GetGlobalForceVector(2)).mean(axis=0)[2]
+        force_ratio = force_vector_z0 / (force_vector_z0 + force_vector_z1)
+        
+        # is averaging the two COP positions correct?
+        return cop0 * force_ratio + cop1 * (1 - force_ratio)

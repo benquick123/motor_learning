@@ -3,9 +3,9 @@
     "participant": {
         "id": 0,
         "height": 1.86,
-        "weight": 0,
+        "weight": 72,
         "gender": "m",
-        "age": 0
+        "age": 27
     },
     "experiment": {
         "total_time": 100,

@@ -9,7 +9,7 @@ import scipy
 
 from vicon import ViconClient
 from experiment_logging import Logger
-from com_computation import compute_com, NOMINAL_HEIGHT
+from com_computation import compute_com, create_marker_dict, NOMINAL_HEIGHT, NOMINAL_WEIGHT
 
 
 class DummyClient:
@@ -29,6 +29,8 @@ def record(total_time, vicon_client, frequency=100):
         time_start = time()
         for marker_name, position in vicon_client.get_current_position(None, mode="all_markers")[0].items():
             positions[marker_name].append(position)
+
+        positions["cop"].append(vicon_client.get_center_of_pressure())
 
         if time() - time_start > (1 / frequency):
             print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, frequency))
@@ -59,29 +61,28 @@ if __name__ == "__main__":
     vicon_client = ViconClient()
     
     # max distance is the same as in FSL measurements.
-    max_distance = 0.020 # m
+    max_distance = 0.05 # m
     
     while True:
         input("Press <Enter> when ready to start recording.")
         
         positions = record(2.0, vicon_client, frequency=experiment_config["refresh_frequency"])
         
-        for value in positions.values():
+        for key, value in positions.items():
             if scipy.spatial.distance.cdist(value, value).max() > max_distance:
-                print("Too much movement. Try again.")
+                print(f"Too much movement on marker {key}. Try again.")
                 break
         else:
             break
         
-    adjustment_ratio = experiment_config["participant"]["height"] / NOMINAL_HEIGHT
+    height_adjustment_ratio = experiment_config["participant"]["height"] / NOMINAL_HEIGHT
+    weight_adjustment_ratio = experiment_config["participant"]["weight"] / NOMINAL_WEIGHT
 
     for measurement_idx in range(len(positions["Upper_body_left_thigh"])):
-        positions["com"].append(compute_com(positions["Upper_body_left_thigh"][measurement_idx],
-                                            positions["Upper_body_right_thigh"][measurement_idx],
-                                            positions["Upper_body_neck"][measurement_idx],
-                                            adjustment_ratio))
+        markers = create_marker_dict(positions, measurement_idx, ignore={"com_approx"})
+        positions["com_approx"].append(compute_com(markers, height_adjustment_ratio, weight_adjustment_ratio, plot=False))
         
-    positions["com"] = np.stack(positions["com"], axis=0)
+    positions["com_approx"] = np.stack(positions["com_approx"], axis=0)
     
     # do a sanity check over all the positions.
     # note that COM is not supposed to be aligned along the Y axis.
@@ -90,7 +91,12 @@ if __name__ == "__main__":
     for key, value in positions.items():
         positions[key] = value.mean(axis=0).tolist()
 
-    positions["com"][1] = None
-        
+    positions["com_offset"] = np.array(positions["cop"]) - np.array(positions["com_approx"])
+    positions["com_offset"][2] = 0
+    positions["com_offset"] = positions["com_offset"].tolist()
+
+    print("COM offsets (x, y, z):")
+    print(positions["com_offset"])
+
     logger.save_com(positions)
     
