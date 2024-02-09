@@ -6,12 +6,15 @@ from time import sleep, time
 
 import numpy as np
 import pygame
+import os
 
 from experiment_logging import Logger
 from vicon import ViconClient
 # from controller import MotorController
 from interface import Interface
 from state_machine import StateMachine
+from com_computation import compute_com, NOMINAL_HEIGHT, NOMINAL_WEIGHT
+from cbos_computation import compute_cbos
 
 
 def initialize_state_dict(experiment_config):
@@ -34,7 +37,10 @@ def initialize_state_dict(experiment_config):
     # state_dict["pixels_per_mm"] = 5.42
     # When using mouse as input
     # state_dict["pixels_per_mm"] = 1
-    state_dict["pixels_per_mm"] = experiment_config["interface"]["pixels_per_mm"]
+    state_dict["pixels_per_m"] = experiment_config["interface"]["pixels_per_m"]
+
+    state_dict["height_adjustment_ratio"] = experiment_config["participant"]["height"] / NOMINAL_HEIGHT
+    state_dict["weight_adjustment_ratio"] = experiment_config["participant"]["weight"] / NOMINAL_WEIGHT
     
     return state_dict
 
@@ -48,12 +54,17 @@ if __name__ == "__main__":
     state_dict = initialize_state_dict(experiment_config)
     
     vicon_client = ViconClient()
-    # controller = MotorController()
-    interface = Interface()
+    interface = Interface(display_number=0)
     state_machine = StateMachine()
+
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=args.no_log)
-    
     logger.save_experiment_config(experiment_config)
+    
+    # controller = MotorController(direction=experiment_config["experiment"]["force_direction"])
+    # controller.set_participant_weight(experiment_config["participant"]["weight"])
+
+    assert os.path.exists(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json")), "Run do_com.py first to obtain participant's COM."
+    participant_com = json.load(open(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json"), "r"))
     
     continue_loop = True
     try:
@@ -62,17 +73,23 @@ if __name__ == "__main__":
             pygame.event.get()
             
             # get marker position
-            marker_position, marker_timestamp = vicon_client.get_current_position()
+            positions = {}
+            for marker_name, marker_position in vicon_client.get_current_position(None, mode="all_markers")[0].items():
+                state_dict[marker_name] = marker_position
+
+            state_dict["com_approx"] = compute_com(state_dict, state_dict["height_adjustment_ratio"], state_dict["weight_adjustment_ratio"])
+            state_dict["com"] = state_dict["com_approx"] + participant_com["com_offset"]
             
             # calculate velocity
-            # marker_velocity = vicon_client.get_velocity(marker_position, timestamp)
+            state_dict["marker_timestamp"] = time()
+            marker_velocity = vicon_client.get_velocity(state_dict["com"], state_dict["marker_timestamp"], "com")
             
             # update state dict
-            # state_dict["marker_position"] = marker_position
-            state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0])
-            # state_dict["marker_velocity"] = marker_velocity
-            # state_dict["marker_timestamp"] = marker_timestamp
-            state_dict["marker_timestamp"] = time()
+            state_dict["marker_position"] = state_dict["com"]
+            # state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
+            state_dict["marker_velocity"] = marker_velocity
+            if "cbos" not in state_dict:
+                state_dict["cbos"] = compute_cbos(state_dict)
                     
             # send data to motor controller
             # motor_force = controller.get_force(marker_velocity)

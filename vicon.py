@@ -81,7 +81,7 @@ class ViconClient:
         if name not in self.prev_marker_positions:
             velocity = np.ones(3) * 0
         else:
-            velocity = (current_marker_position - self.prev_marker_position[name]) / (current_time - self.prev_time[name])
+            velocity = (current_marker_position - self.prev_marker_positions[name]) / (current_time - self.prev_times[name])
 
         self.prev_marker_positions[name] = np.copy(current_marker_position)
         self.prev_times[name] = current_time
