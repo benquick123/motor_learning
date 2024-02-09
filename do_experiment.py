@@ -10,7 +10,7 @@ import os
 
 from experiment_logging import Logger
 from vicon import ViconClient
-# from controller import MotorController
+from controller import MotorController
 from interface import Interface
 from state_machine import StateMachine
 from com_computation import compute_com, NOMINAL_HEIGHT, NOMINAL_WEIGHT
@@ -60,8 +60,8 @@ if __name__ == "__main__":
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=args.no_log)
     logger.save_experiment_config(experiment_config)
     
-    # controller = MotorController(direction=experiment_config["experiment"]["force_direction"])
-    # controller.set_participant_weight(experiment_config["participant"]["weight"])
+    controller = MotorController(direction=experiment_config["experiment"]["force_direction"])
+    controller.set_participant_weight(experiment_config["participant"]["weight"])
 
     assert os.path.exists(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json")), "Run do_com.py first to obtain participant's COM."
     participant_com = json.load(open(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json"), "r"))
@@ -85,17 +85,18 @@ if __name__ == "__main__":
             marker_velocity = vicon_client.get_velocity(state_dict["com"], state_dict["marker_timestamp"], "com")
             
             # update state dict
-            state_dict["marker_position"] = state_dict["com"]
-            # state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
+            # state_dict["marker_position"] = state_dict["com"]
+            state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
             state_dict["marker_velocity"] = marker_velocity
             if "cbos" not in state_dict:
                 state_dict["cbos"] = compute_cbos(state_dict)
                     
             # send data to motor controller
-            # motor_force = controller.get_force(marker_velocity)
-            # state_dict["motor_force"] = motor_force
-            # controller.set_force_amplification(state_dict["current_force_amplification"])
-            # controller.send_position(*motor_force)
+            controller.set_force_amplification(state_dict["current_force_amplification"])
+            motor_force = controller.get_force(marker_velocity)
+            state_dict["motor_force"] = motor_force
+            print(motor_force, end="\r")
+            controller.send_force(motor_force)
             
             state_dict["enter_pressed"] = pygame.key.get_pressed()[pygame.K_RETURN]
             
