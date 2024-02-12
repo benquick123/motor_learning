@@ -183,16 +183,16 @@ class StateMachine:
         state_dict["main_circle_offset"] = (state_dict["marker_position"] - state_dict["cbos"]) * state_dict["pixels_per_m"]
         state_dict["show_progress_bar"] = state_dict["show_remaining_time"] = state_dict["show_score"] = True
         state_dict["main_text"] = ""
-        state_dict["main_circle_color"] = Colors.DARK_GRAY
+        state_dict["main_circle_color"] = Colors.BLACK
 
     def set_go_to_middle_circle(self, state_dict):
         state_dict["state_start_time"] = None
-        state_dict["middle_circle_color"] = Colors.BLACK
+        state_dict["middle_circle_color"] = Colors.LIGHT_GRAY
 
     def set_in_middle_circle(self, state_dict):
         state_dict["state_start_time"] = time()
         state_dict["state_wait_time"] = 2.0 # s
-        state_dict["middle_circle_color"] = Colors.BLACK
+        state_dict["middle_circle_color"] = Colors.DARK_GRAY
 
     def set_go_to_left_circle_after_trial(self, state_dict):
         state_dict["state_start_time"] = None
@@ -257,6 +257,7 @@ class StateMachine:
         state_dict["left_circle_color"] = Colors.WHITE
         state_dict["right_circle_color"] = Colors.WHITE
         
+        state_dict["current_force_amplification"] = 0
         state_dict["show_progress_bar"] = state_dict["show_remaining_time"] = state_dict["show_score"] = False
         
         state_dict["main_text"] = "Press <Enter> to exit."

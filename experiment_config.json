@@ -2,8 +2,8 @@
     "results_path": "./results",
     "participant": {
         "id": 0,
-        "height": 1.86,
-        "weight": 72,
+        "height": 1.63,
+        "weight": 58,
         "gender": "m",
         "age": 27
     },
@@ -14,7 +14,7 @@
         "force_direction": "forward"
     },
     "interface": {
-        "pixels_per_m": 3657
+        "pixels_per_m": 3200
     },
-    "refresh_frequency": 100
+    "refresh_frequency": 200
 }

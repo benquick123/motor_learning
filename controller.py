@@ -16,7 +16,7 @@ class MotorController:
         self.max_velocity = max_velocity
 
         assert direction in {"forward", "backward"}
-        self.direction = 1 if direction == "forward" else -1
+        self.direction = -1 if direction == "forward" else 1
         
     def send_force(self, force):
         data = struct.pack("d", force)
@@ -25,7 +25,10 @@ class MotorController:
     def get_force(self, velocity):
         assert len(velocity) == 3
         velocity = np.copy(velocity).clip(-self.max_velocity, self.max_velocity)
-        return self.direction * np.abs(velocity[0]) * self.force_amplification * self.participant_weight
+        force = self.direction * np.abs(velocity[0]) * self.force_amplification * self.participant_weight
+        if np.isnan(force):
+            return 0.0
+        return force
     
     def set_force_amplification(self, force_amplification):
         self.force_amplification = force_amplification

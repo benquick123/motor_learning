@@ -33,7 +33,7 @@ class Interface:
     
     def update(self, state_dict):
         if "main_circle_position" not in state_dict:
-            state_dict["main_circle_radius"] = 0.004 * state_dict["pixels_per_m"]
+            state_dict["main_circle_radius"] = 0.002 * state_dict["pixels_per_m"]
             state_dict["main_circle_color"] = Colors.WHITE
         if "middle_circle_position" not in state_dict:
             state_dict["middle_circle_position"] = np.array([self.window_width / 2, self.window_height / 2])
@@ -56,8 +56,13 @@ class Interface:
             state_dict["screen_center_position"] = np.array([self.window_width / 2, self.window_height / 2])
         
         # update the raw marker position to reflect the position on screen
-        position_x = self.window_width / 2 + state_dict["marker_position"][0] * state_dict["pixels_per_m"] - state_dict["main_circle_offset"][0]
-        position_y = self.window_height / 2 + state_dict["marker_position"][1] * state_dict["pixels_per_m"] - state_dict["main_circle_offset"][1]
+        # TODO: properly update the x direction of the marker.
+        position_x = self.window_width / 2 + (-state_dict["marker_position"][0] - state_dict["cbos"][0]) * state_dict["pixels_per_m"] - state_dict["main_circle_offset"][0]
+        position_y = self.window_height / 2 + (state_dict["marker_position"][1] - state_dict["cbos"][1]) * state_dict["pixels_per_m"] - state_dict["main_circle_offset"][1]
+        # print(state_dict["main_circle_offset"][0], state_dict["main_circle_offset"][1], 
+        #       state_dict["marker_position"][0], state_dict["marker_position"][1], 
+        #       state_dict["marker_position"][0] * state_dict["pixels_per_m"], state_dict["marker_position"][1] * state_dict["pixels_per_m"], 
+        #       position_x, position_y)
         self.main_circle_buffer.append(np.array([position_x, position_y]))
         if len(self.main_circle_buffer) > self.main_circle_buffer_size:
             self.main_circle_buffer = self.main_circle_buffer[1:]

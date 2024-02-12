@@ -33,10 +33,6 @@ def initialize_state_dict(experiment_config):
     state_dict["show_score"] = False
     state_dict["state_wait_time"] = -1
     
-    # Samsung S32A704NWU monitor
-    # state_dict["pixels_per_mm"] = 5.42
-    # When using mouse as input
-    # state_dict["pixels_per_mm"] = 1
     state_dict["pixels_per_m"] = experiment_config["interface"]["pixels_per_m"]
 
     state_dict["height_adjustment_ratio"] = experiment_config["participant"]["height"] / NOMINAL_HEIGHT
@@ -54,7 +50,7 @@ if __name__ == "__main__":
     state_dict = initialize_state_dict(experiment_config)
     
     vicon_client = ViconClient()
-    interface = Interface(display_number=0)
+    interface = Interface(display_number=1, main_circle_buffer_size=2)
     state_machine = StateMachine()
 
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=args.no_log)
@@ -85,8 +81,8 @@ if __name__ == "__main__":
             marker_velocity = vicon_client.get_velocity(state_dict["com"], state_dict["marker_timestamp"], "com")
             
             # update state dict
-            # state_dict["marker_position"] = state_dict["com"]
-            state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
+            state_dict["marker_position"] = state_dict["com"]
+            # state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
             state_dict["marker_velocity"] = marker_velocity
             if "cbos" not in state_dict:
                 state_dict["cbos"] = compute_cbos(state_dict)
@@ -95,7 +91,7 @@ if __name__ == "__main__":
             controller.set_force_amplification(state_dict["current_force_amplification"])
             motor_force = controller.get_force(marker_velocity)
             state_dict["motor_force"] = motor_force
-            print(motor_force, end="\r")
+            # print(motor_force, end="\r")
             controller.send_force(motor_force)
             
             state_dict["enter_pressed"] = pygame.key.get_pressed()[pygame.K_RETURN]
@@ -111,9 +107,10 @@ if __name__ == "__main__":
             
             # calculate time and optionally wait
             if time() - time_start > (1 / state_dict["frequency"]):
-                print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, state_dict["frequency"]))
+                pass
+                # print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, state_dict["frequency"]), end="\r")
             else:
-                sleep((1 / state_dict["frequency"]) - (time() - time_start))
+                sleep(np.abs((1 / state_dict["frequency"]) - (time() - time_start)))
                 
     except Exception:
         print(traceback.format_exc())

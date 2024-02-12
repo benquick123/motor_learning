@@ -8,4 +8,5 @@ def compute_cbos(markers):
         marker_positions.append(markers[key])
 
     marker_positions = np.stack(marker_positions, axis=0)
+
     return np.mean(marker_positions, axis=0)
