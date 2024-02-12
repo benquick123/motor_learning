@@ -9,4 +9,6 @@
 
 ## TODO
 
-- update the sizes (magic numbers in interface:update) to correspond to whatever is measured on the screen.
+- change colors
+- get frequency
+- reverse x-axis direction of the COM.
