@@ -66,7 +66,7 @@ if __name__ == "__main__":
     controller = MotorController(direction=experiment_config["experiment"]["force_direction"], force_mode=experiment_config["experiment"]["force_mode"])
     controller.set_participant_weight(experiment_config["participant"]["weight"])
 
-    assert os.path.exists(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json")), "Run do_com.py first to obtain participant's COM."
+    assert os.path.exists(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json")), "Run do_before.py first to obtain participant's COM."
     participant_com = json.load(open(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json"), "r"))
     
     continue_loop = True
