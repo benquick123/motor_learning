@@ -22,7 +22,13 @@ def initialize_state_dict(experiment_config):
     state_dict["frequency"] = experiment_config["refresh_frequency"]
     state_dict["force_amplification"] = experiment_config["experiment"]["force_amplification"]
     state_dict["total_time"] = experiment_config["experiment"]["total_time"]
+    state_dict["total_trials"] = experiment_config["experiment"]["total_trials"]
     state_dict["state_wait_time_range"] = experiment_config["experiment"]["state_wait_time_range"]
+    state_dict["desired_trial_time"] = experiment_config["experiment"]["desired_trial_time"]
+    state_dict["catch_trial_idxs"] = experiment_config["experiment"]["catch_trial_idxs"]
+
+    state_dict["pause_frequency"] = experiment_config["experiment"]["pause_frequency"]
+    state_dict["pause_duration"] = experiment_config["experiment"]["pause_duration"]
     
     state_dict["current_force_amplification"] = 0
     state_dict["main_circle_offset"] = np.zeros(2)
@@ -44,6 +50,7 @@ def initialize_state_dict(experiment_config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--no_log", action="store_true", help="Disable logging")
+    parser.add_argument("--debug", action="store_true", help="Enable debugging, i.e. mouse controlled COM.")
     args = parser.parse_args()
     
     experiment_config = json.load(open("experiment_config.json", "r"))
@@ -56,7 +63,7 @@ if __name__ == "__main__":
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=args.no_log)
     logger.save_experiment_config(experiment_config)
     
-    controller = MotorController(direction=experiment_config["experiment"]["force_direction"])
+    controller = MotorController(direction=experiment_config["experiment"]["force_direction"], force_mode=experiment_config["experiment"]["force_mode"])
     controller.set_participant_weight(experiment_config["participant"]["weight"])
 
     assert os.path.exists(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json")), "Run do_com.py first to obtain participant's COM."
@@ -81,8 +88,11 @@ if __name__ == "__main__":
             marker_velocity = vicon_client.get_velocity(state_dict["com"], state_dict["marker_timestamp"], "com")
             
             # update state dict
-            # state_dict["marker_position"] = state_dict["com"]
-            state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
+            if args.debug:
+                state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
+            else:
+                state_dict["marker_position"] = state_dict["com"]
+
             state_dict["marker_velocity"] = marker_velocity
             if "cbos" not in state_dict:
                 state_dict["cbos"] = compute_cbos(state_dict)

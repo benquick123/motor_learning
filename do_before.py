@@ -62,7 +62,7 @@ def plot_markers(positions):
 if __name__ == "__main__":
     experiment_config = json.load(open("experiment_config.json", "r"))
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=False)
-    logger.save_experiment_config(experiment_config)
+    logger.save_experiment_config(experiment_config, filename="calibration_config.json")
     
     vicon_client = ViconClient()
 

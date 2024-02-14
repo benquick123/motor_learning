@@ -17,6 +17,8 @@ cd motor_learning_code <Press Enter>
 5. Do the particpant feet placement and COM estimation using `python do_before.py`. Follow the instructions in the terminal window. After the estimation is done, the results should be available in the `results` folder.
 6. Run the experiment by starting `python do_experiment.py`.
 
+Everytime the experiment is executed, the index of the logged experiment configuration and trajectory data gets incremented to avoid losing any data. Keep this in mind if you run the script multiple times.
+
 ## Configuration example:
 
 ```json
@@ -55,7 +57,7 @@ Above, "experiment" field determines majority of the parameters necessary for ru
 - `force_direction`: either "forward" or "backward". Determines the direction of the perturbation. Used only when "force_mode" is "regular". 
 - `force_mode`: either "regular", "none" or "channel" depending on whether we want to create perturbations (regular mode), no perturbation (none mode) or help the participant (channel mode).
 - `force_multiplication`: the coefficient of the perturbation, used when "force_mode" is "regular" or "channel". 
-- `catch_trial_idxs`: the trials in which the perturbation is "randomly" turned off. Only used in the trial_mode branch. If empty, there are no catch trials.
+- `catch_trial_idxs`: the trials in which the perturbation is "randomly" turned off. Only used in the trial_mode branch. If empty, there are no catch trials. Indices of the catch trials start from 0.
 - `pause_frequency`: the frequency of pauses in number of trials. Only used in the trial_mode branch.
 - `pause_duration`: the duration of the pauses in seconds between blocks, as frequent as specified by the "pause_frequency" parameter. Only used in the trial_mode branch.
 
