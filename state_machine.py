@@ -174,61 +174,56 @@ class StateMachine:
         state_dict["remaining_time"] = state_dict["total_time"]
         state_dict["score"] = 0
         
-        state_dict["main_circle_color"] = Colors.WHITE
-        state_dict["start_circle_color"] = Colors.WHITE
-        state_dict["terminal_circle_color"] = Colors.WHITE
+        state_dict["main_circle_color"] = Colors.BLACK
+        state_dict["middle_circle_color"] = Colors.BLACK
+        state_dict["left_circle_color"] = Colors.BLACK
+        state_dict["right_circle_color"] = Colors.BLACK
 
     def set_start_experiment(self, state_dict):
         state_dict["experiment_start"] = time()
         state_dict["main_circle_offset"] = (state_dict["marker_position"] - state_dict["cbos"]) * state_dict["pixels_per_m"]
         state_dict["show_progress_bar"] = state_dict["show_remaining_time"] = state_dict["show_score"] = True
         state_dict["main_text"] = ""
-        state_dict["main_circle_color"] = Colors.BLACK
+        state_dict["main_circle_color"] = Colors.LIGHT_GRAY
 
     def set_go_to_middle_circle(self, state_dict):
         state_dict["state_start_time"] = None
-        state_dict["middle_circle_color"] = Colors.LIGHT_GRAY
+        state_dict["middle_circle_color"] = Colors.DARK_GRAY
 
     def set_in_middle_circle(self, state_dict):
         state_dict["state_start_time"] = time()
         state_dict["state_wait_time"] = 2.0 # s
-        state_dict["middle_circle_color"] = Colors.DARK_GRAY
+        state_dict["middle_circle_color"] = Colors.BLUE
 
     def set_go_to_left_circle_after_trial(self, state_dict):
         state_dict["state_start_time"] = None
-        state_dict["middle_circle_color"] = Colors.WHITE
-        if state_dict["left_circle_color"] == Colors.WHITE:
+        state_dict["middle_circle_color"] = Colors.BLACK
+        if state_dict["left_circle_color"] == Colors.BLACK:
             state_dict["left_circle_color"] = Colors.BLUE
-        state_dict["right_circle_color"] = Colors.LIGHT_GRAY
+        state_dict["right_circle_color"] = Colors.DARK_GRAY
     
     def set_go_to_right_circle_after_trial(self, state_dict):
         state_dict["state_start_time"] = None
-        state_dict["middle_circle_color"] = Colors.WHITE
-        state_dict["left_circle_color"] = Colors.LIGHT_GRAY
+        state_dict["middle_circle_color"] = Colors.BLACK
+        state_dict["left_circle_color"] = Colors.DARK_GRAY
     
     def set_in_left_circle(self, state_dict):
         state_dict["state_start_time"] = time()
         state_dict["state_wait_time"] = np.random.uniform(*state_dict["state_wait_time_range"])
-    
-    def set_change_left_circle_color_after_trial(self, state_dict):
-        state_dict["left_circle_color"] = Colors.BLUE
 
     def set_in_right_circle(self, state_dict):
         state_dict["state_start_time"] = time()
         state_dict["state_wait_time"] = np.random.uniform(*state_dict["state_wait_time_range"])
-    
-    def set_change_right_circle_color_after_trial(self, state_dict):
-        state_dict["right_circle_color"] = Colors.BLUE
         
     def set_go_out_of_left_circle(self, state_dict):
         state_dict["state_start_time"] = time()
-        state_dict["left_circle_color"] = Colors.LIGHT_GRAY
+        state_dict["left_circle_color"] = Colors.DARK_GRAY
         state_dict["right_circle_color"] = Colors.BLUE
     
     def set_go_out_of_right_circle(self, state_dict):
         state_dict["state_start_time"] = time()
         state_dict["left_circle_color"] = Colors.BLUE
-        state_dict["right_circle_color"] = Colors.LIGHT_GRAY
+        state_dict["right_circle_color"] = Colors.DARK_GRAY
 
     def set_go_to_left_circle(self, state_dict):
         state_dict["state_start_time"] = None
@@ -253,9 +248,9 @@ class StateMachine:
         state_dict["current_force_amplification"] = 0
 
     def set_exit(self, state_dict):
-        state_dict["main_circle_color"] = Colors.WHITE
-        state_dict["left_circle_color"] = Colors.WHITE
-        state_dict["right_circle_color"] = Colors.WHITE
+        state_dict["main_circle_color"] = Colors.BLACK
+        state_dict["left_circle_color"] = Colors.BLACK
+        state_dict["right_circle_color"] = Colors.BLACK
         
         state_dict["current_force_amplification"] = 0
         state_dict["show_progress_bar"] = state_dict["show_remaining_time"] = state_dict["show_score"] = False

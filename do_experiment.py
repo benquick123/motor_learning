@@ -81,8 +81,8 @@ if __name__ == "__main__":
             marker_velocity = vicon_client.get_velocity(state_dict["com"], state_dict["marker_timestamp"], "com")
             
             # update state dict
-            state_dict["marker_position"] = state_dict["com"]
-            # state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
+            # state_dict["marker_position"] = state_dict["com"]
+            state_dict["marker_position"] = np.array(list(pygame.mouse.get_pos()) + [0]) / 1000
             state_dict["marker_velocity"] = marker_velocity
             if "cbos" not in state_dict:
                 state_dict["cbos"] = compute_cbos(state_dict)
@@ -106,12 +106,17 @@ if __name__ == "__main__":
             logger.save_datapoint(state_dict)
             
             # calculate time and optionally wait
+            curr_frequency = 1 / (time() - time_start + 1e-8)
+            curr_frequency = np.round(curr_frequency, 2)
+            curr_frequency = np.clip(curr_frequency, 0, 999)
+            print("Capture frequency:", curr_frequency, " " * 20, end="\r")
             if time() - time_start > (1 / state_dict["frequency"]):
                 pass
                 # print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, state_dict["frequency"]), end="\r")
             else:
                 sleep(np.abs((1 / state_dict["frequency"]) - (time() - time_start)))
                 
+        print()
     except Exception:
         print(traceback.format_exc())
     finally:    

@@ -32,8 +32,13 @@ def record(total_time, vicon_client, frequency=100):
 
         positions["cop"].append(vicon_client.get_center_of_pressure())
 
+        curr_frequency = 1 / (time() - time_start + 1e-8)
+        curr_frequency = np.round(curr_frequency, 2)
+        curr_frequency = np.clip(curr_frequency, 0, 999)
+        print("Capture frequency:", curr_frequency, " " * 20, end="\r")
         if time() - time_start > (1 / frequency):
-            print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, frequency))
+            pass
+            # print(datetime.now(), "- Loop took too much time!", "%.3fs > (1/%d)s" % (time() - time_start, frequency))
         else:
             sleep((1 / frequency) - (time() - time_start))
         
@@ -60,10 +65,43 @@ if __name__ == "__main__":
     logger.save_experiment_config(experiment_config)
     
     vicon_client = ViconClient()
-    
-    # max distance is the same as in FSL measurements.
+
+    ### align feet with hips
+    max_distance = 0.02
+    thigh_distance = feet_distance = feet_center_displacement = np.inf
+    while np.abs(thigh_distance - feet_distance) > max_distance or np.abs(feet_center_displacement) > max_distance:
+        time_start = time()
+        positions = vicon_client.get_current_position(None, mode="all_markers")[0]
+        left_thigh = positions["Upper_body_left_thigh"]
+        right_thigh = positions["Upper_body_right_thigh"]
+        thigh_distance = np.linalg.norm(left_thigh - right_thigh)
+        
+        # assuming #3 is the outmost marker on the feet:
+        left_outmost_foot = positions["Left_foot3"]
+        right_outmost_foot = positions["Right_foot3"]
+        feet_distance = np.linalg.norm(left_outmost_foot - right_outmost_foot)
+
+        feet_center_displacement = (left_outmost_foot[0] + right_outmost_foot[0]) / 2
+
+        if feet_center_displacement > max_distance:
+            print("Move both feet to the left by", np.abs(np.round(feet_center_displacement, 2)), "m", " " * 20, end="\r")
+        elif feet_center_displacement < -max_distance:
+            print("Move both feet to the right by", np.abs(np.round(feet_center_displacement, 2)), "m", " " * 20, end="\r")
+        elif (thigh_distance - feet_distance) > max_distance:
+            # put your feet further apart
+            print("Put feet further away by", np.round(thigh_distance - feet_distance, 4), "m", " " * 20, end="\r")
+        elif (thigh_distance - feet_distance) < -max_distance:
+            # put your feet closer
+            print("Put feet closer by", np.round(thigh_distance - feet_distance, 4), "m", " " * 20, end="\r")
+        
+    print()
+    print("Thigh distance:", thigh_distance)
+    print("Feet distance:", feet_distance)
+    print("Feet center displacement:", feet_center_displacement)
+    print("POSITIONING COMPLETE.", "\n")
+
+    ### get measurements related to COM and COP
     max_distance = 0.05 # m
-    
     while True:
         input("Press <Enter> when ready to start recording.")
         
@@ -96,6 +134,7 @@ if __name__ == "__main__":
     positions["com_offset"][2] = 0
     positions["com_offset"] = positions["com_offset"].tolist()
 
+    print()
     print("COM offsets (x, y, z):")
     print(positions["com_offset"])
 

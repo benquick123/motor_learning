@@ -8,7 +8,7 @@
 3. Do the particpant feet placement and COM estimation using `python do_before.py`. After the estimation is done, the results should be available in the `results` folder.
 4. Run the experiment by starting `python do_experiment.py`.
 
-## Config example:
+## Configuration example:
 
 ```json
 {
@@ -38,9 +38,10 @@ Above, "force_direction" can be either "forward" or "backward". Variable "force_
 
 Variable "pixels per m" has to be changed every time the screen size or resolution changes. It can be changed by multiplying the number of horizontal pixels with the width of the screen in meters.
 
+Field "participant" contains information about the participant. The subfields "id", "height" and "weight" are neccessary, however, any other entry can be added or removed in addition to these without breaking the experiment code.
+
+It is recommented to keep the "refresh_frequency" at the specificed value.
+
 ## TODO
 
-- change colors
-- get frequency
-- reverse x-axis direction of the COM.
-- create an interface for determining the width of participant's feet relative to the width of their hips.
+- prepare tjasa's part

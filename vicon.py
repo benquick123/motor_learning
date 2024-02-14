@@ -40,6 +40,7 @@ class ViconClient:
         client.SetStreamMode(ViconDataStream.Client.StreamMode.EServerPush)
         # print("Get Frame Push", client.GetFrame(), client.GetFrameNumber())
 
+    
     def get_current_position(self, name, mode="segment"):
         assert mode in {"segment", "marker", "all_markers"}
         
@@ -56,14 +57,12 @@ class ViconClient:
             # ^we are only interested in the three coordinates returned here.
             # we want the middle of the segment
             positions = np.array(segment_position[0]) / 1000
-
-            return positions, time()
+            positions[0] *= -1
 
         elif mode == "marker":
             marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, name)
             positions = np.array(marker_position[0]) / 1000
-
-            return positions, time()
+            positions[0] *= -1
         
         elif mode == "all_markers":
             marker_names = self.client.GetMarkerNames(self.subject_name)
@@ -74,7 +73,9 @@ class ViconClient:
                 marker_name = marker_name[0]
                 marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, marker_name)
                 positions[marker_name] = np.array(marker_position[0]) / 1000
-            return positions, time()
+                positions[marker_name][0] *= -1
+        
+        return positions, time()
 
             
     def get_velocity(self, current_marker_position, current_time, name):
