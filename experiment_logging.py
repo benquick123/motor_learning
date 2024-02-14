@@ -34,13 +34,10 @@ class Logger:
             else:
                 print("Unrecognized data type:", type(state_dict[key]), state_dict[key], key)
     
-        if os.path.exists(os.path.join(self.results_path, self.participant_folder, "experiment_data.tsv")):
-            print(f"Experiment data file for participant #{self.participant_id} already exists!")
-            answer = input("Overwrite? (y/n) ")
-            if answer != "y":
-                exit()
-        
-        self.trajectory_file = open(os.path.join(self.results_path, self.participant_folder, "experiment_data.tsv"), "w")
+        file_idx = len([filename for filename in os.listdir(os.path.join(self.results_path, self.participant_folder)) if filename.startswith("experiment_data")])
+        file_idx = str("%02d" % file_idx)
+
+        self.trajectory_file = open(os.path.join(self.results_path, self.participant_folder, f"experiment_data_{file_idx}.tsv"), "w")
         self.trajectory_file.write("\t".join(self.column_names) + "\n")
         self.trajectory_data_exists = True
     
@@ -67,33 +64,22 @@ class Logger:
         
         self.trajectory_file.write("\t".join(datapoint_to_write) + "\n")
             
-    def save_experiment_config(self, experiment_config):
+    def save_experiment_config(self, experiment_config, filename=None):
         if not self.no_log:
-            if os.path.exists(os.path.join(self.results_path, self.participant_folder, "experiment_config.json")):
-                print(f"Experiment config for participant #{self.participant_id} already exists!")
-                answer = input("Overwrite? (y/n) ")
-                if answer != "y":
-                    return
-                    
-            json.dump(experiment_config, open(os.path.join(self.results_path, self.participant_folder, "experiment_config.json"), "w"), indent=4, sort_keys=True)
-        
-    def save_fsl(self, fsl_dict):
-        if not self.no_log:
-            if os.path.exists(os.path.join(self.results_path, self.participant_folder, "participant_fsl.json")):
-                print(f"Functional stability limits for participant #{self.participant_id} already exist!")
-                answer = input("Overwrite? (y/n) ")
-                if answer != "y":
-                    return
-                    
-            json.dump(fsl_dict, open(os.path.join(self.results_path, self.participant_folder, "participant_fsl.json"), "w"), indent=4, sort_keys=True)
+            if filename is None:
+                file_idx = len([filename for filename in os.listdir(os.path.join(self.results_path, self.participant_folder)) if filename.startswith("experiment_config")])
+                filename = "experiment_config_" + str("%02d" % file_idx) + ".json"
+            else:
+                assert filename.endswith(".json")
+            json.dump(experiment_config, open(os.path.join(self.results_path, self.participant_folder, filename), "w"), indent=4, sort_keys=True)
             
     def save_com(self, com_dict):
         if not self.no_log:
             if os.path.exists(os.path.join(self.results_path, self.participant_folder, "participant_com.json")):
                 print(f"Center of mass measurement for participant #{self.participant_id} already exists!")
-                answer = input("Overwrite? (y/n) ")
+                answer = input("Overwrite? (y)es, (n)o: ")
                 if answer != "y":
-                    return
+                    exit()
                     
             json.dump(com_dict, open(os.path.join(self.results_path, self.participant_folder, "participant_com.json"), "w"), indent=4, sort_keys=True)
         
