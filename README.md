@@ -3,7 +3,7 @@
 ## Experimental setup instructions
 
 0. Turn on and calibrate the VICON system.
-1. From the perspective of the screen, the wand determining the origin should be placed in the middle of the two force plates end facing away from it.
+1. From the perspective of the screen, the wand determining the origin should be placed in the middle of the two force plates and facing away from it.
 2. The code is located in the folder `D:\motor_learning_code`. To run the code, move to that folder by opening the Command Prompt (`cmd`) and typing:
 ```
 D: <Press Enter>
@@ -14,7 +14,7 @@ cd motor_learning_code <Press Enter>
     - If the text says "On branch trial_mode", the experiment will run in trial mode.
     - If the currently open branch does not match the desired mode, change it by typing `git checkout <branch_name>` and pressing Enter.
 4. Input the participant parameters and experiment values into the `experiment_config.json` file.
-5. Do the particpant feet placement and COM estimation using `python do_before.py`. Follow the instructions in the terminal window. After the estimation is done, the results should be available in the `results` folder.
+5. Do the particpant feet placement and COM estimation using `python do_before.py`. Follow the instructions in the terminal window. After the estimation is done, the results should be available in the folder specified in the configuration file.
 6. Run the experiment by starting `python do_experiment.py`.
 
 Everytime the experiment is executed, the index of the logged experiment configuration and trajectory data gets incremented to avoid losing any data. Keep this in mind if you run the script multiple times.
