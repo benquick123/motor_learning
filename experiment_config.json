@@ -2,10 +2,11 @@
     "results_path": "./time_results",
     "participant": {
         "id": 0,
-        "height": 1.63,
-        "weight": 58,
+        "height": 1.85,
+        "weight": 75,
         "gender": "m",
-        "age": 27
+        "age": 27,
+        "name": "Gal"
     },
     "experiment": {
         "total_time": 200,

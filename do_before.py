@@ -67,7 +67,7 @@ if __name__ == "__main__":
     vicon_client = ViconClient()
 
     ### align feet with hips
-    max_distance = 0.02
+    max_distance = 0.01
     thigh_distance = feet_distance = feet_center_displacement = np.inf
     while np.abs(thigh_distance - feet_distance) > max_distance or np.abs(feet_center_displacement) > max_distance:
         time_start = time()
