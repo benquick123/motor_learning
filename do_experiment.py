@@ -99,7 +99,13 @@ if __name__ == "__main__":
                     
             # send data to motor controller
             controller.set_force_amplification(state_dict["current_force_amplification"])
-            motor_force = controller.get_force(marker_velocity)
+            if experiment_config["experiment"]["force_mode"] in {"regular", "none"}:
+                motor_force = controller.get_force(marker_velocity)
+            elif experiment_config["experiment"]["force_mode"] == "channel":
+                motor_force = controller.get_force(state_dict["marker_position"] - state_dict["cbos"])
+            else:
+                print("Incorrect force mode: " + str(experiment_config["experiment"]["force_mode"]))
+                raise NotImplementedError
             state_dict["motor_force"] = motor_force
             # print(motor_force, end="\r")
             controller.send_force(motor_force)
