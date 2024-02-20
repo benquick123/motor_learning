@@ -82,7 +82,8 @@ if __name__ == "__main__":
         feet_distance = np.linalg.norm(left_outmost_foot - right_outmost_foot)
 
         feet_center_displacement = (left_outmost_foot[0] + right_outmost_foot[0]) / 2
-
+        # break the loop; the exact position on the force plates will be adjusted manually.
+        break
         if feet_center_displacement > max_distance:
             print("Move both feet to the left by", np.abs(np.round(feet_center_displacement, 2)), "m", " " * 20, end="\r")
         elif feet_center_displacement < -max_distance:
