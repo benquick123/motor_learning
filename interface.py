@@ -109,7 +109,7 @@ class Interface:
     def _draw_progress_bar(self):
         if self.state_dict.get("show_progress_bar", None):
             pygame.draw.rect(self.window, Colors.RED, pygame.Rect(0, 0.02 * self.window_height, self.window_width, 0.05 * self.window_height))
-            pygame.draw.rect(self.window, Colors.DARK_GREEN, pygame.Rect(0, 0.02 * self.window_height, self.window_width * self.state_dict["remaining_time_perc"], 0.05 * self.window_height))
+            pygame.draw.rect(self.window, Colors.DARK_GREEN, pygame.Rect(0, 0.02 * self.window_height, self.window_width * self.state_dict["remaining_perc"], 0.05 * self.window_height))
     
     def _draw_remaining_time(self):
         if self.state_dict.get("show_remaining_time", None):
