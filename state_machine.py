@@ -17,14 +17,17 @@ class StateMachine:
 
     GO_TO_LEFT_CIRCLE = 6
     IN_LEFT_CIRCLE = 7
-    GO_OUT_OF_LEFT_CIRCLE = 8
+    STAY_IN_LEFT_CIRCLE = 8
+    GO_OUT_OF_LEFT_CIRCLE = 9
 
-    GO_TO_RIGHT_CIRCLE = 9
-    IN_RIGHT_CIRCLE = 10
-    GO_OUT_OF_RIGHT_CIRCLE = 11
+    GO_TO_RIGHT_CIRCLE = 10
+    IN_RIGHT_CIRCLE = 11
+    STAY_IN_RIGHT_CIRCLE = 12
+    GO_OUT_OF_RIGHT_CIRCLE = 13
 
-    TRIAL_TERMINATION = 12
-    EXIT = 13
+    TRIAL_TERMINATION = 14
+    PAUSE = 15
+    EXIT = 16
     
     def __init__(self):
         self.current_state = None
@@ -117,26 +120,57 @@ class StateMachine:
             self.prev_time = time()
 
             if self.current_state == StateMachine.GO_TO_RIGHT_CIRCLE:
+                maybe_next_state = StateMachine.STAY_IN_RIGHT_CIRCLE
+                side = "right"
+            else:
+                maybe_next_state = StateMachine.STAY_IN_LEFT_CIRCLE
+                side = "left"
+            
+            if np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
+                self.current_state = maybe_next_state
+
+            elif (side == "right" and state_dict["main_circle_position"][0] > state_dict[side + "_circle_position"][0]) or \
+                 (side == "left" and state_dict["main_circle_position"][0] < state_dict[side + "_circle_position"][0]):
+                
+                if self._get_line_distance_to_center(self.prev_main_circle_position, state_dict["main_circle_position"], state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
+                    self.set_unsuccessful_trial(state_dict, side)
+                else:
+                    self.set_unsuccessful_trial(state_dict, side)
+                
+                self.current_state = maybe_next_state
+                self.set_trial_termination(state_dict)
+
+        #### WHEN TRIAL ENDED, BUT WE DON'T WANT THE PARTICIPANT TO OVERSHOOT
+        elif self.current_state in {StateMachine.STAY_IN_LEFT_CIRCLE, StateMachine.STAY_IN_RIGHT_CIRCLE}:
+            self.prev_time = time()
+            trial_terminated = False
+
+            if self.current_state == StateMachine.STAY_IN_RIGHT_CIRCLE:
                 maybe_next_state = StateMachine.GO_TO_RIGHT_CIRCLE_AFTER_TRIAL
                 side = "right"
             else:
                 maybe_next_state = StateMachine.GO_TO_LEFT_CIRCLE_AFTER_TRIAL
                 side = "left"
-            
-            if np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
-                self.current_state = maybe_next_state
+
+            if time() - state_dict["state_start_time"] >= state_dict["state_wait_time"]:
                 self.set_successful_trial(state_dict, side)
-                self.set_trial_termination(state_dict)
-            elif (side == "right" and state_dict["main_circle_position"][0] > state_dict[side + "_circle_position"][0]) or \
-                 (side == "left" and state_dict["main_circle_position"][0] < state_dict[side + "_circle_position"][0]):
+                trial_terminated = True
+
+            elif np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) > state_dict[side + "_circle_radius"]:
+                self.set_unsuccessful_trial(state_dict, side)
+                trial_terminated = True
+
+            if trial_terminated:
                 self.current_state = maybe_next_state
-                
-                if self._get_line_distance_to_center(self.prev_main_circle_position, state_dict["main_circle_position"], state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
-                    self.set_successful_trial(state_dict, side)
-                else:
-                    self.set_unsuccessful_trial(state_dict, side)
-                
                 self.set_trial_termination(state_dict)
+
+        elif self.current_state == StateMachine.PAUSE:
+            if time() - state_dict["state_start_time"] >= state_dict["state_wait_time"]:
+                self.current_state = StateMachine.GO_TO_MIDDLE_CIRCLE
+                self.set_unpause(state_dict)
+                self.set_initial_screen(state_dict)
+                self.set_start_experiment(state_dict)
+                self.set_go_to_middle_circle(state_dict)
 
         #### WHEN TRIAL TERMINATES
         elif self.current_state == StateMachine.TRIAL_TERMINATION:
@@ -149,12 +183,18 @@ class StateMachine:
                 continue_loop = False
                 
         state_dict["remaining_time"] = float(np.clip(state_dict["remaining_time"], a_min=0, a_max=state_dict["total_time"]))
-        state_dict["remaining_time_perc"] = state_dict["remaining_time"] / state_dict["total_time"]
+        state_dict["remaining_perc"] = state_dict["remaining_time"] / state_dict["total_time"]
         state_dict["current_state"] = self.reverse_state_lookup[self.current_state]
         
-        if state_dict["remaining_time"] == 0:
-            self.current_state = StateMachine.EXIT
-            self.set_exit(state_dict)
+        if state_dict["remaining_time"] == 0 and \
+           self.current_state not in {StateMachine.PAUSE, StateMachine.STAY_IN_RIGHT_CIRCLE, StateMachine.STAY_IN_LEFT_CIRCLE, StateMachine.GO_TO_RIGHT_CIRCLE_AFTER_TRIAL, StateMachine.GO_TO_LEFT_CIRCLE_AFTER_TRIAL}:
+            if state_dict["block_idx"] < state_dict["total_blocks"] - 1:
+                self.current_state = StateMachine.PAUSE
+                self.set_pause(state_dict)
+                state_dict["needs_update"] = True
+            else:
+                self.current_state = StateMachine.EXIT
+                self.set_exit(state_dict)
             
         if "main_circle_position" in state_dict:
             self.prev_main_circle_position = np.copy(state_dict["main_circle_position"])
@@ -226,12 +266,15 @@ class StateMachine:
         state_dict["right_circle_color"] = Colors.DARK_GRAY
 
     def set_go_to_left_circle(self, state_dict):
-        state_dict["state_start_time"] = None
-        state_dict["current_force_amplification"] = state_dict["force_amplification"]
+        self.set_go_to_circle(state_dict)
     
     def set_go_to_right_circle(self, state_dict):
-        state_dict["state_start_time"] = None
+        self.set_go_to_circle(state_dict)
+
+    def set_go_to_circle(self, state_dict):
+        state_dict["state_start_time"] = time()
         state_dict["current_force_amplification"] = state_dict["force_amplification"]
+        state_dict["perturbation_mode"] = "regular"
         
     def set_successful_trial(self, state_dict, side):
         state_dict["score"] += 1
@@ -246,6 +289,15 @@ class StateMachine:
         state_dict["state_start_time"] = time()
         state_dict["state_wait_time"] = max(state_dict["state_wait_time_range"]) - min(state_dict["state_wait_time_range"])
         state_dict["current_force_amplification"] = 0
+
+    def set_pause(self, state_dict):
+        state_dict["state_start_time"] = time()
+        state_dict["state_wait_time"] = state_dict["pause_duration"]
+        state_dict["current_force_amplification"] = 0
+        state_dict["main_text"] = "Experiment paused for %d seconds" % state_dict["pause_duration"]
+
+    def set_unpause(self, state_dict):
+        state_dict["main_text"] = ""
 
     def set_exit(self, state_dict):
         state_dict["main_circle_color"] = Colors.BLACK
