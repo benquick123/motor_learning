@@ -294,7 +294,7 @@ class StateMachine:
         elif "channel_trial_idxs" in state_dict and isinstance(state_dict["channel_trial_idxs"], list) and len(state_dict["channel_trial_idxs"]) > 0:
             if current_trial_idx in state_dict["channel_trial_idxs"]:
                 state_dict["perturbation_mode"] = "channel"
-            
+                state_dict["current_force_amplification"] = state_dict["channel_amplification"]
 
     def set_successful_trial(self, state_dict, side):
         state_dict["score"] += 1

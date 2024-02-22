@@ -24,6 +24,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
 
     state_dict["frequency"] = experiment_config["refresh_frequency"]
     state_dict["force_amplification"] = experiment_config["experiment"][block_idx]["force_amplification"]
+    state_dict["channel_amplification"] = experiment_config["experiment"][block_idx]["channel_amplification"]
     state_dict["total_time"] = experiment_config["experiment"][block_idx]["total_time"]
     state_dict["total_trials"] = state_dict["remaining_trials"] = experiment_config["experiment"][block_idx]["total_trials"]
     state_dict["remaining_perc"] = 1.0

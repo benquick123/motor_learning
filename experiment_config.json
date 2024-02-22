@@ -18,7 +18,8 @@
             "force_direction": "forward",
             "force_mode": "none",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": []
+            "channel_trial_idxs": [],
+            "channel_amplification": 1.0
         },
         {
             "total_time": 0,
@@ -29,7 +30,8 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": []
+            "channel_trial_idxs": [],
+            "channel_amplification": 1.0
         },
         {
             "total_time": 0,
@@ -40,7 +42,8 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": []
+            "channel_trial_idxs": [],
+            "channel_amplification": 1.0
         },
         {
             "total_time": 0,
@@ -51,7 +54,8 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": []
+            "channel_trial_idxs": [],
+            "channel_amplification": 1.0
         },
         {
             "total_time": 0,
@@ -62,7 +66,8 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": []
+            "channel_trial_idxs": [],
+            "channel_amplification": 1.0
         },
         {
             "total_time": 0,
