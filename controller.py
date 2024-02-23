@@ -36,7 +36,6 @@ class MotorController:
         elif perturbation_mode == "channel":
             # we treat the `coordinates` as position
             position = coordinates
-            # TODO: this might require a change in direction.
             force = -1 * position[1] * self.force_amplification * self.participant_weight
         else:
             force = 0.0
