@@ -221,7 +221,7 @@ class StateMachine:
 
     def set_start_experiment(self, state_dict):
         state_dict["experiment_start"] = time()
-        state_dict["main_circle_offset"] = (state_dict["marker_position"] - state_dict["cbos"]) * state_dict["pixels_per_m"]
+        state_dict["main_circle_offset"] = (state_dict["marker_position"] - state_dict["cbos"])
         state_dict["show_progress_bar"] = state_dict["show_remaining_time"] = state_dict["show_score"] = True
         state_dict["main_text"] = ""
         state_dict["main_circle_color"] = Colors.LIGHT_GRAY
