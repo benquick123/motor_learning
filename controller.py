@@ -28,15 +28,16 @@ class MotorController:
         assert self.force_mode is not None, "You have to set force_mode before obtaining force."
         assert perturbation_mode in {"regular", "channel"}
 
-        if perturbation_mode == "regular":
-            # we treat the `coordinates` as velocity
-            velocity = coordinates
-            velocity = np.copy(velocity).clip(-self.max_velocity, self.max_velocity)
-            force = self.direction * np.abs(velocity[0]) * self.force_amplification * self.participant_weight
-        elif perturbation_mode == "channel":
-            # we treat the `coordinates` as position
-            position = coordinates
-            force = -1 * position[1] * self.force_amplification * self.participant_weight
+        if self.force_mode == "regular":
+            if perturbation_mode == "regular":
+                # we treat the `coordinates` as velocity
+                velocity = coordinates
+                velocity = np.copy(velocity).clip(-self.max_velocity, self.max_velocity)
+                force = self.direction * np.abs(velocity[0]) * self.force_amplification * self.participant_weight
+            elif perturbation_mode == "channel":
+                # we treat the `coordinates` as position
+                position = coordinates
+                force = -1 * position[1] * self.force_amplification * self.participant_weight
         else:
             force = 0.0
 
