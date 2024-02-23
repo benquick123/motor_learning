@@ -126,7 +126,6 @@ class StateMachine:
                 side = "left"
             
             if np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
-                self.current_state = maybe_next_state
                 circle_reached = True
 
             elif (side == "right" and state_dict["main_circle_position"][0] > state_dict[side + "_circle_position"][0]) or \
@@ -137,8 +136,6 @@ class StateMachine:
                 else:
                     self.set_unsuccessful_trial(state_dict, side)
                 
-                self.current_state = maybe_next_state
-                self.set_trial_termination(state_dict)
                 circle_reached = True
 
             if circle_reached:
@@ -151,6 +148,8 @@ class StateMachine:
                     self.set_too_fast(state_dict)
                 elif self.prev_time - state_dict["state_start_time"] > state_dict["desired_trial_time"][1]:
                     self.set_too_slow(state_dict)
+                self.current_state = maybe_next_state
+                self.set_trial_termination(state_dict)
 
         #### WHEN TRIAL ENDED, BUT WE DON'T WANT THE PARTICIPANT TO OVERSHOOT
         elif self.current_state in {StateMachine.STAY_IN_LEFT_CIRCLE, StateMachine.STAY_IN_RIGHT_CIRCLE}:
@@ -310,10 +309,8 @@ class StateMachine:
         state_dict["main_text"] = "Too slow!"
 
     def set_trial_termination(self, state_dict):
-        # state_dict["remaining_time"] -= time() - state_dict["state_start_time"]
-        
         state_dict["state_start_time"] = time()
-        state_dict["state_wait_time"] = max(state_dict["state_wait_time_range"]) - min(state_dict["state_wait_time_range"])
+        state_dict["state_wait_time"] = 1
         state_dict["current_force_amplification"] = 0
 
         state_dict["remaining_trials"] = int(np.clip(state_dict["remaining_trials"], a_min=0, a_max=state_dict["total_trials"]))
