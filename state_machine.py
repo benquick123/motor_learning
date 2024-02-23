@@ -128,6 +128,7 @@ class StateMachine:
             
             if np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
                 self.current_state = maybe_next_state
+                self.set_trial_termination(state_dict)
 
             elif (side == "right" and state_dict["main_circle_position"][0] > state_dict[side + "_circle_position"][0]) or \
                  (side == "left" and state_dict["main_circle_position"][0] < state_dict[side + "_circle_position"][0]):
@@ -283,11 +284,9 @@ class StateMachine:
     def set_unsuccessful_trial(self, state_dict, side):
         state_dict[side + "_circle_color"] = Colors.RED
         
-    def set_trial_termination(self, state_dict):
-        # state_dict["remaining_time"] -= time() - state_dict["state_start_time"]
-        
+    def set_trial_termination(self, state_dict):        
         state_dict["state_start_time"] = time()
-        state_dict["state_wait_time"] = max(state_dict["state_wait_time_range"]) - min(state_dict["state_wait_time_range"])
+        state_dict["state_wait_time"] = 1
         state_dict["current_force_amplification"] = 0
 
     def set_pause(self, state_dict):
