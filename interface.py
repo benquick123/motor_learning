@@ -43,13 +43,13 @@ class Interface:
         if "right_circle_position" not in state_dict:
             # TODO: change this to actual measurement on the screen, e.g. 0.05m from the center.
             state_dict["right_circle_position"] = np.array(state_dict["middle_circle_position"])
-            state_dict["right_circle_position"][0] += 0.05 * state_dict["pixels_per_m"]
+            state_dict["right_circle_position"][0] += 0.06 * state_dict["pixels_per_m"]
             # TODO: change this to r = 0.005m
             state_dict["right_circle_radius"] = 0.005 * state_dict["pixels_per_m"]
             state_dict["right_circle_color"] = Colors.BLACK
         if "left_circle_position" not in state_dict:
             state_dict["left_circle_position"] = np.array(state_dict["middle_circle_position"])
-            state_dict["left_circle_position"][0] -= 0.05 * state_dict["pixels_per_m"]
+            state_dict["left_circle_position"][0] -= 0.06 * state_dict["pixels_per_m"]
             state_dict["left_circle_radius"] = 0.005 * state_dict["pixels_per_m"]
             state_dict["left_circle_color"] = Colors.BLACK
         if "screen_center_position" not in state_dict:

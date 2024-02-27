@@ -310,7 +310,7 @@ class StateMachine:
 
     def set_trial_termination(self, state_dict):
         state_dict["state_start_time"] = time()
-        state_dict["state_wait_time"] = 1
+        state_dict["state_wait_time"] = 0.5
         state_dict["current_force_amplification"] = 0
 
         state_dict["remaining_trials"] = int(np.clip(state_dict["remaining_trials"], a_min=0, a_max=state_dict["total_trials"]))
