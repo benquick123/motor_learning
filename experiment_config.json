@@ -1,11 +1,12 @@
 {
     "results_path": "./trial_results",
     "participant": {
-        "id": 2,
-        "height": 1.65,
-        "weight": 58,
-        "gender": "f",
-        "age": 31
+        "id": 4,
+        "height": 1.93,
+        "weight": 86,
+        "gender": "m",
+        "age": 45,
+        "name": "Simon"
     },
     "experiment_pause_duration": 10,
     "experiment": [
