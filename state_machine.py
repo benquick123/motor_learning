@@ -286,7 +286,7 @@ class StateMachine:
         
     def set_trial_termination(self, state_dict):        
         state_dict["state_start_time"] = time()
-        state_dict["state_wait_time"] = 1
+        state_dict["state_wait_time"] = 0.5
         state_dict["current_force_amplification"] = 0
 
     def set_pause(self, state_dict):
