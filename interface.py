@@ -122,7 +122,7 @@ class Interface:
     def _draw_score(self):
         if self.state_dict.get("show_remaining_time", None):
             # score = str(np.round(self.state_dict["score"] / 10, 2)).zfill(4)
-            render = self.main_font.render("Reward: %.2f€" % (self.state_dict["score"] / 10), True, Colors.WHITE)
+            render = self.main_font.render("Reward: %.2f€" % (self.state_dict["score"] / 20), True, Colors.WHITE)
             render_position_x = 0.5 * self.window_width - render.get_width() / 2
             render_position_y = 0.6 * self.window_height
             self.window.blit(render, (render_position_x, render_position_y))
