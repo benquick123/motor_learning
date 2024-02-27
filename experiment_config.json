@@ -2,10 +2,10 @@
     "results_path": "./time_results",
     "participant": {
         "id": 2,
-        "height": 1.85,
-        "weight": 75,
+        "height": 1.93,
+        "weight": 86,
         "gender": "m",
-        "age": 27,
+        "age": 45,
         "name": "Simon"
     },
     "experiment_pause_duration": 10,
