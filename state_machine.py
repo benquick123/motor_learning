@@ -157,7 +157,7 @@ class StateMachine:
                 self.set_successful_trial(state_dict, side)
                 trial_terminated = True
 
-            elif np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) > state_dict[side + "_circle_radius"]:
+            elif np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) > (state_dict[side + "_circle_radius"] + state_dict["main_circle_radius"]):
                 self.set_unsuccessful_trial(state_dict, side)
                 trial_terminated = True
 
@@ -214,6 +214,7 @@ class StateMachine:
         state_dict["main_text"] = "Press <Enter> when ready."
         state_dict["remaining_time"] = state_dict["total_time"]
         state_dict["score"] = 0
+        state_dict["score_text"] = "Reward: %.2f€" % (state_dict["score"] / 20)
         
         state_dict["main_circle_color"] = Colors.BLACK
         state_dict["middle_circle_color"] = Colors.BLACK
@@ -279,6 +280,7 @@ class StateMachine:
         
     def set_successful_trial(self, state_dict, side):
         state_dict["score"] += 1
+        state_dict["score_text"] = "Reward: %.2f€" % (state_dict["score"] / 20)
         state_dict[side + "_circle_color"] = Colors.DARK_GREEN
         
     def set_unsuccessful_trial(self, state_dict, side):
