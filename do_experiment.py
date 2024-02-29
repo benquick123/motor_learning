@@ -119,7 +119,8 @@ if __name__ == "__main__":
             if state_dict["perturbation_mode"] == "regular":
                 motor_force = controller.get_force(marker_velocity, state_dict["perturbation_mode"])
             elif state_dict["perturbation_mode"] == "channel":
-                motor_force = controller.get_force(state_dict["marker_position"] - state_dict["cbos"] - state_dict["main_circle_offset"], state_dict["perturbation_mode"])
+                # motor_force = controller.get_force(state_dict["marker_position"] - state_dict["cbos"] - state_dict["main_circle_offset"], state_dict["perturbation_mode"])
+                motor_force = controller.get_force(state_dict["marker_position"] - state_dict["cbos"], state_dict["perturbation_mode"])
             else:
                 print("Incorrect perturbation mode: " + str(state_dict["perturbation_mode"]))
                 raise NotImplementedError
