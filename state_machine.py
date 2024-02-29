@@ -33,6 +33,7 @@ class StateMachine:
         self.current_state = None
         self.prev_main_circle_position = None
         self.maybe_next_state = None
+        self.trial_success = None
         
         # construct reverse state lookup
         all_variables = vars(StateMachine)
@@ -142,12 +143,16 @@ class StateMachine:
                 # time() is measured above, and saved to prev_time.
                 # hardcoded check if the trial took more than 2.0 seconds; in this case, the trial will be repeated.
                 # NOTE: the results will still be saved in the logs. Take care to exclude the trial during analysis.
+                self.trial_success = True
                 if self.prev_time - state_dict["state_start_time"] < 2.0:
                     state_dict["remaining_trials"] += -1
                 if self.prev_time - state_dict["state_start_time"] < state_dict["desired_trial_time"][0]:
                     self.set_too_fast(state_dict)
+                    self.trial_success = False
                 elif self.prev_time - state_dict["state_start_time"] > state_dict["desired_trial_time"][1]:
                     self.set_too_slow(state_dict)
+                    self.trial_success = False
+
                 self.current_state = maybe_next_state
                 self.set_trial_termination(state_dict)
 
@@ -166,9 +171,13 @@ class StateMachine:
             if time() - state_dict["state_start_time"] >= state_dict["state_wait_time"]:
                 self.current_state = maybe_next_state
                 self.set_successful_trial(state_dict, side)
+                if self.trial_success:
+                    # increase the score displayed on screen.
+                    state_dict["score"] += 1
+                    state_dict["score_text"] = "Score: %d" % state_dict["score"]
                 trial_terminated = True
 
-            elif np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) > state_dict[side + "_circle_radius"]:
+            elif np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) > (state_dict[side + "_circle_radius"] + state_dict["main_circle_radius"]):
                 self.set_unsuccessful_trial(state_dict, side)
                 trial_terminated = True
 
@@ -178,11 +187,12 @@ class StateMachine:
                 
         elif self.current_state == StateMachine.PAUSE:
             if time() - state_dict["state_start_time"] >= state_dict["state_wait_time"]:
-                self.current_state = StateMachine.GO_TO_MIDDLE_CIRCLE
+                self.current_state = StateMachine.GO_TO_LEFT_CIRCLE_AFTER_TRIAL
                 self.set_unpause(state_dict)
                 self.set_initial_screen(state_dict)
                 self.set_start_experiment(state_dict)
-                self.set_go_to_middle_circle(state_dict)
+                # self.set_go_to_middle_circle(state_dict)
+                self.set_go_to_left_circle_after_trial(state_dict)
 
         elif self.current_state == StateMachine.EXIT:
             if state_dict["enter_pressed"]:
@@ -213,8 +223,10 @@ class StateMachine:
     def set_initial_screen(self, state_dict):
         state_dict["state_start_time"] = None
         state_dict["main_text"] = "Press <Enter> when ready."
+        assert state_dict["total_trials"] % 2 == 0, "The total number of trials must be divisible by 2 to make sure that the participant continues on the side it finished before the pause."
         state_dict["remaining_trials"] = state_dict["total_trials"]
         state_dict["score"] = 0
+        state_dict["score_text"] = "Score: %d" % state_dict["score"]
         
         state_dict["main_circle_color"] = Colors.BLACK
         state_dict["middle_circle_color"] = Colors.BLACK
@@ -224,9 +236,10 @@ class StateMachine:
     def set_start_experiment(self, state_dict):
         state_dict["experiment_start"] = time()
         state_dict["score"] = 0
+        state_dict["score_text"] = "Score: %d" % state_dict["score"]
         state_dict["main_circle_offset"] = (state_dict["marker_position"] - state_dict["cbos"]) # * state_dict["pixels_per_m"]
-        state_dict["show_progress_bar"] = True
-        state_dict["show_remaining_time"] = state_dict["show_score"] = False
+        state_dict["show_progress_bar"] = state_dict["show_score"] = True
+        state_dict["show_remaining_time"] = False
         state_dict["main_text"] = ""
         state_dict["main_circle_color"] = Colors.LIGHT_GRAY
 
@@ -296,7 +309,6 @@ class StateMachine:
                 state_dict["current_force_amplification"] = state_dict["channel_amplification"]
 
     def set_successful_trial(self, state_dict, side):
-        state_dict["score"] += 1
         state_dict[side + "_circle_color"] = Colors.DARK_GREEN
         
     def set_unsuccessful_trial(self, state_dict, side):
