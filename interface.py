@@ -56,8 +56,8 @@ class Interface:
             state_dict["screen_center_position"] = np.array([self.window_width / 2, self.window_height / 2])
         
         # update the raw marker position to reflect the position on screen
-        position_x = self.window_width / 2 + (state_dict["marker_position"][0] - state_dict["cbos"][0] - state_dict["main_circle_offset"][0]) * state_dict["pixels_per_m"]
-        position_y = self.window_height / 2 + (state_dict["marker_position"][1] - state_dict["cbos"][1] - state_dict["main_circle_offset"][1]) * state_dict["pixels_per_m"]
+        position_x = self.window_width / 2 + (state_dict["marker_position"][0] - state_dict["cbos"][0]) * state_dict["pixels_per_m"]
+        position_y = self.window_height / 2 + (state_dict["marker_position"][1] - state_dict["cbos"][1]) * state_dict["pixels_per_m"]
         self.main_circle_buffer.append(np.array([position_x, position_y]))
         if len(self.main_circle_buffer) > self.main_circle_buffer_size:
             self.main_circle_buffer = self.main_circle_buffer[1:]
@@ -120,9 +120,9 @@ class Interface:
             self.window.blit(render, (render_position_x, render_position_y))
     
     def _draw_score(self):
-        if self.state_dict.get("show_remaining_time", None):
-            # score = str(np.round(self.state_dict["score"] / 10, 2)).zfill(4)
-            render = self.main_font.render("Reward: %.2f€" % (self.state_dict["score"] / 20), True, Colors.WHITE)
+        if self.state_dict.get("show_score", None):
+            render = self.main_font.render(self.state_dict["score_text"], True, Colors.WHITE)
+            # render = self.main_font.render("Reward: %.2f€" % (self.state_dict["score"] / 20), True, Colors.WHITE)
             render_position_x = 0.5 * self.window_width - render.get_width() / 2
             render_position_y = 0.6 * self.window_height
             self.window.blit(render, (render_position_x, render_position_y))
