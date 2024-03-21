@@ -33,7 +33,7 @@ class StateMachine:
         self.current_state = None
         self.prev_main_circle_position = None
         self.maybe_next_state = None
-        self.trial_success = None
+        self.trial_success = self.trial_score_success = None
         
         # construct reverse state lookup
         all_variables = vars(StateMachine)
@@ -117,6 +117,7 @@ class StateMachine:
         #### WHEN TRIAL IS IN PROGRESS
         elif self.current_state in {StateMachine.GO_TO_RIGHT_CIRCLE, StateMachine.GO_TO_LEFT_CIRCLE}:
             self.prev_time = time()
+            self.trial_success = self.trial_score_success = False
             circle_reached = False
 
             if self.current_state == StateMachine.GO_TO_RIGHT_CIRCLE:
@@ -128,6 +129,7 @@ class StateMachine:
             
             if np.linalg.norm(state_dict["main_circle_position"] - state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
                 circle_reached = True
+                self.trial_success = True
 
             elif (side == "right" and state_dict["main_circle_position"][0] > state_dict[side + "_circle_position"][0]) or \
                  (side == "left" and state_dict["main_circle_position"][0] < state_dict[side + "_circle_position"][0]):
@@ -143,15 +145,15 @@ class StateMachine:
                 # time() is measured above, and saved to prev_time.
                 # hardcoded check if the trial took more than 2.0 seconds; in this case, the trial will be repeated.
                 # NOTE: the results will still be saved in the logs. Take care to exclude the trial during analysis.
-                self.trial_success = True
+                self.trial_score_success = True
                 if self.prev_time - state_dict["state_start_time"] < 2.0:
                     state_dict["remaining_trials"] += -1
                 if self.prev_time - state_dict["state_start_time"] < state_dict["desired_trial_time"][0]:
                     self.set_too_fast(state_dict)
-                    self.trial_success = False
+                    self.trial_score_success = False
                 elif self.prev_time - state_dict["state_start_time"] > state_dict["desired_trial_time"][1]:
                     self.set_too_slow(state_dict)
-                    self.trial_success = False
+                    self.trial_score_success = False
 
                 self.current_state = maybe_next_state
                 self.set_trial_termination(state_dict)
@@ -170,8 +172,10 @@ class StateMachine:
 
             if time() - state_dict["state_start_time"] >= state_dict["state_wait_time"]:
                 self.current_state = maybe_next_state
-                self.set_successful_trial(state_dict, side)
                 if self.trial_success:
+                    self.set_successful_trial(state_dict, side)
+                    
+                if self.trial_score_success:
                     # increase the score displayed on screen.
                     state_dict["score"] += 1
                     state_dict["score_text"] = "Score: %d" % state_dict["score"]
