@@ -12,12 +12,7 @@ def compute_cbos(markers):
     marker_positions = np.stack(marker_positions, axis=0)
     marker_positions2 = np.roll(marker_positions, -1, axis=0)
 
-    print(marker_positions)
-    print(marker_positions2)
-
     signed_areas = 0.5 * np.cross(marker_positions, marker_positions2)
     centroids = (marker_positions + marker_positions2) / 3.0
-
-    print(centroids)
 
     return np.average(centroids, axis=0, weights=signed_areas)
