@@ -1,5 +1,7 @@
 from time import time
 from datetime import datetime
+import socket
+from multiprocessing import Process, Value
 
 import numpy as np
 from vicon_dssdk import ViconDataStream
@@ -17,6 +19,9 @@ class ViconClient:
         self.prev_times = dict()
         
         self.init_connection(self.client)
+
+        self._is_recording = Value("i", 0)
+        self.udp_listener = Process(target=self._get_recording_state, args=(self._is_recording, ), daemon=True).start()
         
     def init_connection(self, client):
         client.Connect(self.address + ":" + str(self.port))
@@ -40,6 +45,8 @@ class ViconClient:
         client.SetStreamMode(ViconDataStream.Client.StreamMode.EServerPush)
         # print("Get Frame Push", client.GetFrame(), client.GetFrameNumber())
 
+    def is_recording(self):
+        return bool(self._is_recording.value)
     
     def get_current_position(self, name, mode="segment"):
         assert mode in {"segment", "marker", "all_markers"}
@@ -76,8 +83,7 @@ class ViconClient:
                 positions[marker_name][0] *= -1
         
         return positions, time()
-
-            
+        
     def get_velocity(self, current_marker_position, current_time, name):
         if name not in self.prev_marker_positions:
             velocity = np.ones(3) * 0
@@ -88,7 +94,7 @@ class ViconClient:
         self.prev_times[name] = current_time
         
         return velocity
-    
+
     def get_center_of_pressure(self):
         has_frame = False
         while not has_frame:
@@ -107,3 +113,17 @@ class ViconClient:
         
         # is averaging the two COP positions correct?
         return cop0 * force_ratio + cop1 * (1 - force_ratio)
+
+    @staticmethod
+    def _get_recording_state(is_recording):
+        udp_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        udp_client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        udp_client.bind(("", 30))
+
+        while True:
+            data, _ = udp_client.recvfrom(1024)
+            data = data.decode('utf-8')
+            if "CaptureStart" in data:
+                is_recording.value = 1
+            elif "CaptureStop" in data:
+                is_recording.value = 0

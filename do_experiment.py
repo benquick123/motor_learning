@@ -43,6 +43,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
     state_dict["show_remaining_time"] = False
     state_dict["show_score"] = False
     state_dict["current_state"] = StateMachine.INITIAL_SCREEN
+    state_dict["is_recording"] = False
 
     state_dict["total_blocks"] = total_blocks
     state_dict["block_idx"] = block_idx
@@ -77,13 +78,14 @@ if __name__ == "__main__":
 
     assert os.path.exists(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json")), "Run do_before.py first to obtain participant's COM."
     participant_com = json.load(open(os.path.join(logger.results_path, logger.participant_folder, "participant_com.json"), "r"))
-    
+
     continue_loop = True
     state_dict = None
     block_idx, total_blocks = 0, len(experiment_config["experiment"])
     try:
         while continue_loop:
             if state_dict is None or state_dict["needs_update"]:
+                print(datetime.now(), "Starting block %d" % (block_idx + 1))
                 state_dict = initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks)
                 controller.set_direction(experiment_config["experiment"][block_idx]["force_direction"])
                 controller.set_force_mode(experiment_config["experiment"][block_idx]["force_mode"])
@@ -91,6 +93,8 @@ if __name__ == "__main__":
 
             time_start = time()
             pygame.event.get()
+
+            state_dict["is_recording"] = vicon_client.is_recording()
             
             # get marker position
             positions = {}

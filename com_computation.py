@@ -52,33 +52,33 @@ def compute_com(markers, height_adjustment_ratio, weight_adjustment_ratio, plot=
     # get the positions of all missing markers
     midpoint = 0.5 * (markers["Upper_body_left_thigh"] + markers["Upper_body_right_thigh"])
 
-    inner_thigh_ratio = (ld / 2) / np.linalg.norm(midpoint - markers["Upper_body_left_thigh"]) # should be the same for left and right
+    inner_thigh_ratio = (ld / 2) / (np.linalg.norm(midpoint - markers["Upper_body_left_thigh"]) + 1e-8) # should be the same for left and right
     inner_thigh_left = midpoint * inner_thigh_ratio + markers["Upper_body_left_thigh"] * (1 - inner_thigh_ratio)
     inner_thigh_right = midpoint * inner_thigh_ratio + markers["Upper_body_right_thigh"] * (1 - inner_thigh_ratio)
     
-    knee_ratio_left = lb / np.linalg.norm(inner_thigh_left - markers["Left_foot_heel"])
+    knee_ratio_left = lb / (np.linalg.norm(inner_thigh_left - markers["Left_foot_heel"]) + 1e-8)
     knee_left = markers["Left_foot_heel"] * knee_ratio_left + inner_thigh_left * (1 - knee_ratio_left)
-    knee_ratio_right = lb / np.linalg.norm(inner_thigh_right - markers["Right_foot_heel"])
+    knee_ratio_right = lb / (np.linalg.norm(inner_thigh_right - markers["Right_foot_heel"]) + 1e-8)
     knee_right = markers["Right_foot_heel"] * knee_ratio_right + inner_thigh_right * (1 - knee_ratio_right)
     
     # obtain lower back marker position
     # assuming y axis is the one we are not interested in
     hip_distance = np.linalg.norm(markers["Upper_body_right_thigh"] - markers["Upper_body_left_thigh"])
-    lower_back_x = -lh2 * (markers["Upper_body_left_thigh"][2] - markers["Upper_body_right_thigh"][2]) / hip_distance + (markers["Upper_body_left_thigh"][0] + markers["Upper_body_right_thigh"][0]) / 2
-    lower_back_z = lh2 * (markers["Upper_body_left_thigh"][0] - markers["Upper_body_right_thigh"][0]) / hip_distance + (markers["Upper_body_left_thigh"][2] + markers["Upper_body_right_thigh"][2]) / 2
+    lower_back_x = -lh2 * (markers["Upper_body_left_thigh"][2] - markers["Upper_body_right_thigh"][2]) / (hip_distance + (markers["Upper_body_left_thigh"][0] + markers["Upper_body_right_thigh"][0]) / 2 + 1e-8)
+    lower_back_z = lh2 * (markers["Upper_body_left_thigh"][0] - markers["Upper_body_right_thigh"][0]) / (hip_distance + (markers["Upper_body_left_thigh"][2] + markers["Upper_body_right_thigh"][2]) / 2 + 1e-8)
     lower_back = midpoint.copy()
     lower_back[0] = lower_back_x
     lower_back[2] = lower_back_z
 
     # get COMs of all the lower body parts
-    thigh_left_com_ratio = rhoc / np.linalg.norm(knee_left - inner_thigh_left)
+    thigh_left_com_ratio = rhoc / (np.linalg.norm(knee_left - inner_thigh_left) + 1e-8)
     thigh_left_com = inner_thigh_left * thigh_left_com_ratio + knee_left * (1 - thigh_left_com_ratio) # C*
-    thigh_right_com_ratio = rhoc / np.linalg.norm(knee_right - inner_thigh_right)
+    thigh_right_com_ratio = rhoc / (np.linalg.norm(knee_right - inner_thigh_right) + 1e-8)
     thigh_right_com = inner_thigh_right * thigh_right_com_ratio + knee_right * (1 - thigh_right_com_ratio) # E*
 
-    shank_left_com_ratio = rhob / np.linalg.norm(knee_left - markers["Left_foot_heel"])
+    shank_left_com_ratio = rhob / (np.linalg.norm(knee_left - markers["Left_foot_heel"]) + 1e-8)
     shank_left_com = knee_left * shank_left_com_ratio + markers["Left_foot_heel"] * (1 - shank_left_com_ratio) # F*
-    shank_right_com_ratio = rhob / np.linalg.norm(knee_right - markers["Right_foot_heel"])
+    shank_right_com_ratio = rhob / (np.linalg.norm(knee_right - markers["Right_foot_heel"]) + 1e-8)
     shank_right_com = knee_right * shank_right_com_ratio + markers["Right_foot_heel"] * (1 - shank_right_com_ratio) # B*
 
     foot_left_com = np.array(markers["Left_foot_heel"])
@@ -93,7 +93,7 @@ def compute_com(markers, height_adjustment_ratio, weight_adjustment_ratio, plot=
     pelvis_com_ratio = rhod2 / lh2
     pelvis_com = midpoint * pelvis_com_ratio + lower_back * (1 - pelvis_com_ratio)
 
-    torso_com_ratio = rhoh2 / np.linalg.norm(lower_back - markers["Upper_body_neck"])
+    torso_com_ratio = rhoh2 / (np.linalg.norm(lower_back - markers["Upper_body_neck"]) + 1e-8)
     torso_com = lower_back * torso_com_ratio + markers["Upper_body_neck"] * (1 - torso_com_ratio)
 
     # get the actual center of mass

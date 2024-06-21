@@ -7,27 +7,28 @@ from interface import Colors
 class StateMachine:
     
     INITIAL_SCREEN = 0
+    WAITING_FOR_START = 1
     
-    GO_TO_MIDDLE_CIRCLE = 1
-    IN_MIDDLE_CIRCLE = 2
-    GO_OUT_OF_MIDDLE_CIRCLE = 3
+    GO_TO_MIDDLE_CIRCLE = 2
+    IN_MIDDLE_CIRCLE = 3
+    GO_OUT_OF_MIDDLE_CIRCLE = 4
     
-    GO_TO_LEFT_CIRCLE_AFTER_TRIAL = 4
-    GO_TO_RIGHT_CIRCLE_AFTER_TRIAL = 5
+    GO_TO_LEFT_CIRCLE_AFTER_TRIAL = 5
+    GO_TO_RIGHT_CIRCLE_AFTER_TRIAL = 6
 
-    GO_TO_LEFT_CIRCLE = 6
-    IN_LEFT_CIRCLE = 7
-    STAY_IN_LEFT_CIRCLE = 8
-    GO_OUT_OF_LEFT_CIRCLE = 9
+    GO_TO_LEFT_CIRCLE = 7
+    IN_LEFT_CIRCLE = 8
+    STAY_IN_LEFT_CIRCLE = 9
+    GO_OUT_OF_LEFT_CIRCLE = 10
 
-    GO_TO_RIGHT_CIRCLE = 10
-    IN_RIGHT_CIRCLE = 11
-    STAY_IN_RIGHT_CIRCLE = 12
-    GO_OUT_OF_RIGHT_CIRCLE = 13
+    GO_TO_RIGHT_CIRCLE = 11
+    IN_RIGHT_CIRCLE = 12
+    STAY_IN_RIGHT_CIRCLE = 13
+    GO_OUT_OF_RIGHT_CIRCLE = 14
 
-    TRIAL_TERMINATION = 14
-    PAUSE = 15
-    EXIT = 16
+    TRIAL_TERMINATION = 15
+    PAUSE = 16
+    EXIT = 17
     
     def __init__(self):
         self.current_state = None
@@ -42,10 +43,14 @@ class StateMachine:
         
         #### WHEN NONE
         if self.current_state is None:
-            self.current_state = StateMachine.INITIAL_SCREEN
-            self.set_initial_screen(state_dict)
+            self.current_state = StateMachine.WAITING_FOR_START
+            self.set_waiting_for_start(state_dict)
 
         #### AT THE BEGINNING
+        elif self.current_state == StateMachine.WAITING_FOR_START:
+            if state_dict["is_recording"] == True:
+                self.set_initial_screen(state_dict)
+
         elif self.current_state == StateMachine.INITIAL_SCREEN:
             if state_dict["enter_pressed"]:
                 self.current_state = StateMachine.GO_TO_MIDDLE_CIRCLE
@@ -209,9 +214,9 @@ class StateMachine:
         denominator = np.linalg.norm(p0 - p1)
         return numerator / denominator
 
-    def set_initial_screen(self, state_dict):
+    def set_waiting_for_start(self, state_dict):
         state_dict["state_start_time"] = None
-        state_dict["main_text"] = "Press <Enter> when ready."
+        state_dict["main_text"] = "Waiting to start recording."
         state_dict["remaining_time"] = state_dict["total_time"]
         state_dict["score"] = 0
         state_dict["score_text"] = "Reward: %.2f€" % (state_dict["score"] / 20)
@@ -220,6 +225,10 @@ class StateMachine:
         state_dict["middle_circle_color"] = Colors.BLACK
         state_dict["left_circle_color"] = Colors.BLACK
         state_dict["right_circle_color"] = Colors.BLACK
+
+    def set_initial_screen(self, state_dict):
+        state_dict["state_start_time"] = None
+        state_dict["main_text"] = "Press <Enter> when ready."
 
     def set_start_experiment(self, state_dict):
         state_dict["experiment_start"] = time()
