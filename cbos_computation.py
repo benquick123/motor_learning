@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.spatial import ConvexHull
+from scipy.spatial._qhull import QhullError
 
 
 def compute_cbos(markers):
@@ -12,6 +13,10 @@ def compute_cbos(markers):
     
     marker_positions = np.stack(marker_positions, axis=0)
 
-    hull = ConvexHull(marker_positions)
-    centroid = np.mean(hull.points[hull.vertices], axis=0)
+    try:
+        hull = ConvexHull(marker_positions)
+        centroid = np.mean(hull.points[hull.vertices], axis=0)
+    except QhullError:
+        centroid = np.zeros(3)
+
     return centroid
