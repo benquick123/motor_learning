@@ -49,6 +49,7 @@ class StateMachine:
         #### AT THE BEGINNING
         elif self.current_state == StateMachine.WAITING_FOR_START:
             if state_dict["is_recording"] == True:
+                self.current_state = StateMachine.INITIAL_SCREEN
                 self.set_initial_screen(state_dict)
 
         elif self.current_state == StateMachine.INITIAL_SCREEN:
