@@ -9,7 +9,7 @@
             "force_direction": "forward",
             "force_mode": "none",
             "state_wait_time_range": [1, 3],
-            "total_time": 100,
+            "total_time": 10,
             "total_trials": 0
         },
         {
@@ -30,12 +30,12 @@
         "pixels_per_m": 3200
     },
     "participant": {
-        "age": 31,
+        "age": 27,
         "gender": "m",
-        "height": 1.75,
-        "id": 3,
-        "name": "Marko",
-        "weight": 80
+        "height": 1.85,
+        "id": 4,
+        "name": "Benjamin",
+        "weight": 74
     },
     "refresh_frequency": 200,
     "results_path": "./time_results"

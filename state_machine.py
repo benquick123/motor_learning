@@ -175,6 +175,7 @@ class StateMachine:
             if time() - state_dict["state_start_time"] >= state_dict["state_wait_time"]:
                 self.current_state = StateMachine.GO_TO_MIDDLE_CIRCLE
                 self.set_unpause(state_dict)
+                self.set_waiting_for_start(state_dict)
                 self.set_initial_screen(state_dict)
                 self.set_start_experiment(state_dict)
                 self.set_go_to_middle_circle(state_dict)

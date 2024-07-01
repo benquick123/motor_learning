@@ -2,7 +2,7 @@
 
 ## Experimental setup instructions
 
-0. Turn on and calibrate the VICON system.
+0. Turn on and calibrate the VICON system. Before proceeding, make sure that the "Data management" tab is set to `D:\ViconData\Whole Body Motor Learning\Generic Patient\Experimental Session`.
 1. From the perspective of the screen, the wand determining the origin should be placed in the middle of the two force plates and facing away from it.
 2. The code is located in the folder `D:\motor_learning_code`. To run the code, move to that folder by opening the Command Prompt (`cmd`) and typing:
 ```
