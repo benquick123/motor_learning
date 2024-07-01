@@ -12,10 +12,13 @@ cd motor_learning_code <Press Enter>
 3. Before starting the experiment, check the current code branch. This determines whether "time" or "trial" mode will be employed. You do so by opening Command Prompt (`cmd`), and typing `git status` and checking the first line of the output.
     - If the text says "On branch master", the experiment will run in time mode.
     - If the text says "On branch trial_mode", the experiment will run in trial mode.
-    - If the currently open branch does not match the desired mode, change it by typing `git checkout <branch_name>` and pressing Enter.
+    - If the currently open branch does not match the desired mode, change it by typing `git checkout <branch_name>` and pressing Enter. 
+    - In case the files have changed on the current branch (e.g. `experiment_config.json`), it is recommended to force checkout and discard changes when asked by the prompt.
+
 4. Input the participant parameters and experiment values into the `experiment_config.json` file.
 5. Do the particpant feet placement and COM estimation using `python do_before.py`. Follow the instructions in the terminal window. After the estimation is done, the results should be available in the folder specified in the configuration file.
-6. Run the experiment by starting `python do_experiment.py`. Make sure to start the recording in VICON as per instructions on the screen.
+6. Run the experiment by starting `python do_experiment.py`. 
+7. Make sure to start the recording in VICON as per instructions on the screen. The network trigger has to be enabled and armed under the `Capture` tab in VICON before starting the recording.
 
 Everytime the experiment is executed, the index of the logged experiment configuration and trajectory data gets incremented to avoid losing any data. Keep this in mind if you run the script multiple times.
 
