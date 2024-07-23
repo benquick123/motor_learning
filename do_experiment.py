@@ -86,7 +86,7 @@ if __name__ == "__main__":
     try:
         while continue_loop:
             if state_dict is None or state_dict["needs_update"]:
-                print(datetime.now(), "Starting block %d" % (block_idx + 1))
+                print(datetime.now(), "- Starting block %d" % (block_idx + 1))
                 state_dict = initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks)
                 controller.set_direction(experiment_config["experiment"][block_idx]["force_direction"])
                 controller.set_force_mode(experiment_config["experiment"][block_idx]["force_mode"])
