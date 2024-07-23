@@ -84,7 +84,8 @@
         }
     ],
     "interface": {
-        "pixels_per_m": 3200
+        "pixels_per_m": 3200,
+        "display_scaling": 2.0
     },
     "refresh_frequency": 200
 }
