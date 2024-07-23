@@ -36,6 +36,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
     state_dict["pause_duration"] = experiment_config["experiment_pause_duration"]
     
     state_dict["current_force_amplification"] = 0
+    state_dict["current_force_decay"] = 0
     state_dict["main_circle_offset"] = np.zeros(2)
     
     state_dict["experiment_start"] = -1
@@ -126,6 +127,7 @@ if __name__ == "__main__":
             controller.set_force_amplification(state_dict["current_force_amplification"])
             if state_dict["perturbation_mode"] == "regular":
                 motor_force = controller.get_force(marker_velocity, state_dict["perturbation_mode"])
+                motor_force = max(0, motor_force - state_dict["current_force_decay"])
             elif state_dict["perturbation_mode"] == "channel":
                 motor_force = controller.get_force(state_dict["marker_position"] - state_dict["cbos"], state_dict["perturbation_mode"])
             else:
@@ -133,6 +135,8 @@ if __name__ == "__main__":
                 raise NotImplementedError
             state_dict["motor_force"] = motor_force
             # print(motor_force, end="\r")
+            if motor_force > 0:
+                print(datetime.now(), "-", motor_force)
             controller.send_force(motor_force)
             
             state_dict["enter_pressed"] = pygame.key.get_pressed()[pygame.K_RETURN]
