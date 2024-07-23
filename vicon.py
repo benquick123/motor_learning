@@ -2,6 +2,7 @@ from time import time
 from datetime import datetime
 import socket
 from multiprocessing import Process, Value
+from collections import defaultdict
 
 import numpy as np
 from vicon_dssdk import ViconDataStream
@@ -9,7 +10,7 @@ from vicon_dssdk import ViconDataStream
 
 class ViconClient:
     
-    def __init__(self, subject_name="WholeBodyLearningExp", address="localhost", port=801):
+    def __init__(self, subject_name="WholeBodyLearningExp", address="localhost", port=801, velocity_buffer_size=5):
         self.address = address
         self.port = port
         self.client = ViconDataStream.Client()
@@ -17,6 +18,9 @@ class ViconClient:
         self.subject_name = subject_name
         self.prev_marker_positions = dict()
         self.prev_times = dict()
+
+        self.velocity_buffer_size = velocity_buffer_size
+        self.velocity_buffer = defaultdict(list)
         
         self.init_connection(self.client)
 
@@ -92,8 +96,12 @@ class ViconClient:
 
         self.prev_marker_positions[name] = np.copy(current_marker_position)
         self.prev_times[name] = current_time
-        
-        return velocity
+
+        self.velocity_buffer[name].append(velocity)
+        if len(self.velocity_buffer[name]) > self.velocity_buffer_size:
+            self.velocity_buffer[name] = self.velocity_buffer[name][1:]
+
+        return np.stack(self.velocity_buffer[name], axis=0).mean(axis=0)
 
     def get_center_of_pressure(self):
         has_frame = False

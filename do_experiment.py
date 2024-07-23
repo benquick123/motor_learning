@@ -30,6 +30,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
     state_dict["remaining_perc"] = 1.0
     state_dict["state_wait_time_range"] = experiment_config["experiment"][block_idx]["state_wait_time_range"]
     state_dict["desired_trial_time"] = experiment_config["experiment"][block_idx]["desired_trial_time"]
+    state_dict["desired_velocity"] = experiment_config["experiment"][block_idx]["desired_velocity"]
     state_dict["catch_trial_idxs"] = experiment_config["experiment"][block_idx]["catch_trial_idxs"]
     state_dict["channel_trial_idxs"] = experiment_config["experiment"][block_idx]["channel_trial_idxs"]
     state_dict["perturbation_mode"] = "regular"
@@ -37,6 +38,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
     
     state_dict["current_force_amplification"] = 0
     state_dict["current_force_decay"] = 0
+    state_dict["max_trial_velocity"] = 0
     state_dict["main_circle_offset"] = np.zeros(2)
     
     state_dict["experiment_start"] = -1
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     
     experiment_config = json.load(open("experiment_config.json", "r"))
     
-    vicon_client = ViconClient()
+    vicon_client = ViconClient(velocity_buffer_size=experiment_config["velocity_buffer_size"])
     interface = Interface(display_number=1, main_circle_buffer_size=2)
     state_machine = StateMachine()
 
@@ -120,23 +122,25 @@ if __name__ == "__main__":
                 state_dict["marker_position"] = state_dict["com"]
 
             state_dict["marker_velocity"] = marker_velocity
+            state_dict["max_trial_velocity"] = max(state_dict["max_trial_velocity"], np.linalg.norm(marker_velocity))
             if "cbos" not in state_dict:
                 state_dict["cbos"] = compute_cbos(state_dict)
                     
             # send data to motor controller
+            state_dict["current_force_amplification"] = max(0, state_dict["current_force_amplification"] - state_dict["current_force_decay"])
             controller.set_force_amplification(state_dict["current_force_amplification"])
             if state_dict["perturbation_mode"] == "regular":
                 motor_force = controller.get_force(marker_velocity, state_dict["perturbation_mode"])
-                motor_force = max(0, motor_force - state_dict["current_force_decay"])
             elif state_dict["perturbation_mode"] == "channel":
                 motor_force = controller.get_force(state_dict["marker_position"] - state_dict["cbos"], state_dict["perturbation_mode"])
             else:
                 print("Incorrect perturbation mode: " + str(state_dict["perturbation_mode"]))
                 raise NotImplementedError
             state_dict["motor_force"] = motor_force
-            # print(motor_force, end="\r")
-            if motor_force > 0:
+            
+            if np.abs(motor_force) > 0:
                 print(datetime.now(), "-", motor_force)
+            
             controller.send_force(motor_force)
             
             state_dict["enter_pressed"] = pygame.key.get_pressed()[pygame.K_RETURN]

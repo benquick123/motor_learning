@@ -154,10 +154,13 @@ class StateMachine:
                 self.trial_score_success = True
                 if self.prev_time - state_dict["state_start_time"] < 2.0:
                     state_dict["remaining_trials"] += -1
-                if self.prev_time - state_dict["state_start_time"] < state_dict["desired_trial_time"][0]:
+
+                if (self.prev_time - state_dict["state_start_time"] < state_dict["desired_trial_time"][0]) or \
+                    (state_dict["max_trial_velocity"] > state_dict["desired_velocity"][1]):
                     self.set_too_fast(state_dict)
                     self.trial_score_success = False
-                elif self.prev_time - state_dict["state_start_time"] > state_dict["desired_trial_time"][1]:
+                elif (self.prev_time - state_dict["state_start_time"] > state_dict["desired_trial_time"][1]) or \
+                    (state_dict["max_trial_velocity"] < state_dict["desired_velocity"][0]):
                     self.set_too_slow(state_dict)
                     self.trial_score_success = False
 
@@ -342,6 +345,7 @@ class StateMachine:
         state_dict["state_wait_time"] = 0.5
         # state_dict["current_force_amplification"] = 0
         state_dict["current_force_decay"] = state_dict["force_amplification"] / 100
+        state_dict["max_trial_velocity"] = 0
 
         state_dict["remaining_trials"] = int(np.clip(state_dict["remaining_trials"], a_min=0, a_max=state_dict["total_trials"]))
         state_dict["remaining_perc"] = state_dict["remaining_trials"] / state_dict["total_trials"]
