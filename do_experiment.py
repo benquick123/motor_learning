@@ -49,6 +49,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
     state_dict["block_idx"] = block_idx
     
     state_dict["pixels_per_m"] = experiment_config["interface"]["pixels_per_m"]
+    state_dict["display_scaling"] = experiment_config["interface"]["display_scaling"]
 
     state_dict["height_adjustment_ratio"] = experiment_config["participant"]["height"] / NOMINAL_HEIGHT
     state_dict["weight_adjustment_ratio"] = experiment_config["participant"]["weight"] / NOMINAL_WEIGHT
@@ -94,7 +95,10 @@ if __name__ == "__main__":
             time_start = time()
             pygame.event.get()
 
-            state_dict["is_recording"] = vicon_client.is_recording()
+            if args.no_log:
+                state_dict["is_recording"] = True
+            else:
+                state_dict["is_recording"] = vicon_client.is_recording()
             
             # get marker position
             positions = {}

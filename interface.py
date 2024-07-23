@@ -33,31 +33,31 @@ class Interface:
     
     def update(self, state_dict):
         if "main_circle_position" not in state_dict:
-            state_dict["main_circle_radius"] = 0.002 * state_dict["pixels_per_m"]
+            state_dict["main_circle_radius"] = 0.002 * state_dict["pixels_per_m"] * state_dict["display_scaling"]
             state_dict["main_circle_color"] = Colors.BLACK
         if "middle_circle_position" not in state_dict:
             state_dict["middle_circle_position"] = np.array([self.window_width / 2, self.window_height / 2])
             # TODO: change this to r = 0.005m
-            state_dict["middle_circle_radius"] = 0.005 * state_dict["pixels_per_m"]
+            state_dict["middle_circle_radius"] = 0.005 * state_dict["pixels_per_m"] * state_dict["display_scaling"]
             state_dict["middle_circle_color"] = Colors.BLACK
         if "right_circle_position" not in state_dict:
             # TODO: change this to actual measurement on the screen, e.g. 0.05m from the center.
             state_dict["right_circle_position"] = np.array(state_dict["middle_circle_position"])
-            state_dict["right_circle_position"][0] += 0.06 * state_dict["pixels_per_m"]
+            state_dict["right_circle_position"][0] += 0.06 * state_dict["pixels_per_m"] * state_dict["display_scaling"]
             # TODO: change this to r = 0.005m
-            state_dict["right_circle_radius"] = 0.005 * state_dict["pixels_per_m"]
+            state_dict["right_circle_radius"] = 0.005 * state_dict["pixels_per_m"] * state_dict["display_scaling"]
             state_dict["right_circle_color"] = Colors.BLACK
         if "left_circle_position" not in state_dict:
             state_dict["left_circle_position"] = np.array(state_dict["middle_circle_position"])
-            state_dict["left_circle_position"][0] -= 0.06 * state_dict["pixels_per_m"]
-            state_dict["left_circle_radius"] = 0.005 * state_dict["pixels_per_m"]
+            state_dict["left_circle_position"][0] -= 0.06 * state_dict["pixels_per_m"] * state_dict["display_scaling"]
+            state_dict["left_circle_radius"] = 0.005 * state_dict["pixels_per_m"] * state_dict["display_scaling"]
             state_dict["left_circle_color"] = Colors.BLACK
         if "screen_center_position" not in state_dict:
             state_dict["screen_center_position"] = np.array([self.window_width / 2, self.window_height / 2])
         
         # update the raw marker position to reflect the position on screen
-        position_x = self.window_width / 2 + (state_dict["marker_position"][0] - state_dict["cbos"][0]) * state_dict["pixels_per_m"]
-        position_y = self.window_height / 2 + (state_dict["marker_position"][1] - state_dict["cbos"][1]) * state_dict["pixels_per_m"]
+        position_x = self.window_width / 2 + (state_dict["marker_position"][0] - state_dict["cbos"][0]) * state_dict["pixels_per_m"] * state_dict["display_scaling"]
+        position_y = self.window_height / 2 + (state_dict["marker_position"][1] - state_dict["cbos"][1]) * state_dict["pixels_per_m"] * state_dict["display_scaling"]
         self.main_circle_buffer.append(np.array([position_x, position_y]))
         if len(self.main_circle_buffer) > self.main_circle_buffer_size:
             self.main_circle_buffer = self.main_circle_buffer[1:]
@@ -122,7 +122,7 @@ class Interface:
     def _draw_score(self):
         if self.state_dict.get("show_score", None):
             render = self.main_font.render(self.state_dict["score_text"], True, Colors.WHITE)
-            # render = self.main_font.render(, True, Colors.WHITE)
+            # render = self.main_font.render("Reward: %.2f€" % (self.state_dict["score"] / 20), True, Colors.WHITE)
             render_position_x = 0.5 * self.window_width - render.get_width() / 2
             render_position_y = 0.6 * self.window_height
             self.window.blit(render, (render_position_x, render_position_y))
