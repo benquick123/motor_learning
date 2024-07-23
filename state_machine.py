@@ -220,7 +220,8 @@ class StateMachine:
         state_dict["state_start_time"] = None
         state_dict["main_text"] = "Waiting to start recording."
         state_dict["remaining_time"] = state_dict["total_time"]
-        state_dict["score"] = 0
+        if state_dict["block_idx"] == 0:
+            state_dict["score"] = 0
         state_dict["score_text"] = "Reward: %.2f€" % (state_dict["score"] / 20)
         
         state_dict["main_circle_color"] = Colors.BLACK
