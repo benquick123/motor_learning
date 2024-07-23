@@ -39,5 +39,6 @@
         "weight": 74
     },
     "refresh_frequency": 200,
+    "velocity_buffer_size": 5,
     "results_path": "./time_results"
 }
