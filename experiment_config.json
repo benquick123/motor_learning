@@ -27,7 +27,8 @@
     ],
     "experiment_pause_duration": 10,
     "interface": {
-        "pixels_per_m": 3200
+        "pixels_per_m": 3200,
+        "display_scaling": 2.0
     },
     "participant": {
         "age": 27,
