@@ -158,6 +158,7 @@ if __name__ == "__main__":
                 sleep(np.abs((1 / state_dict["frequency"]) - (time() - time_start)))
                 
         print()
+        print(state_dict["score_text"])
     except Exception:
         print(traceback.format_exc())
     finally:    

@@ -250,7 +250,8 @@ class StateMachine:
 
     def set_start_experiment(self, state_dict):
         state_dict["experiment_start"] = time()
-        state_dict["score"] = 0
+        if state_dict["block_idx"] == 0:
+            state_dict["score"] = 0
         state_dict["score_text"] = "Score: %d" % state_dict["score"]
         state_dict["main_circle_offset"] = (state_dict["marker_position"] - state_dict["cbos"]) # * state_dict["pixels_per_m"]
         state_dict["show_progress_bar"] = state_dict["show_score"] = True
