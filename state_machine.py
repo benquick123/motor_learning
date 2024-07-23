@@ -324,7 +324,6 @@ class StateMachine:
             if current_trial_idx in state_dict["channel_trial_idxs"]:
                 state_dict["perturbation_mode"] = "channel"
                 state_dict["current_force_amplification"] = state_dict["channel_amplification"]
-                state_dict["current_force_decay"] = 0
 
     def set_successful_trial(self, state_dict, side):
         state_dict[side + "_circle_color"] = Colors.DARK_GREEN
@@ -351,8 +350,7 @@ class StateMachine:
     def set_pause(self, state_dict):
         state_dict["state_start_time"] = time()
         state_dict["state_wait_time"] = state_dict["pause_duration"]
-        # state_dict["current_force_amplification"] = 0
-        state_dict["current_force_decay"] = state_dict["force_amplification"]
+        state_dict["current_force_amplification"] = 0
         state_dict["main_text"] = "Experiment paused for %d seconds." % state_dict["pause_duration"]
 
     def set_unpause(self, state_dict):
