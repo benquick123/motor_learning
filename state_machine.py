@@ -136,8 +136,8 @@ class StateMachine:
                 self.current_state = maybe_next_state
                 self.set_trial_termination(state_dict)
 
-            elif (side == "right" and state_dict["main_circle_position"][0] > state_dict[side + "_circle_position"][0]) or \
-                 (side == "left" and state_dict["main_circle_position"][0] < state_dict[side + "_circle_position"][0]):
+            elif (side == "right" and state_dict["main_circle_position"][0] > (state_dict[side + "_circle_position"][0] + state_dict[side + "_circle_radius"])) or \
+                 (side == "left" and state_dict["main_circle_position"][0] < (state_dict[side + "_circle_position"][0] - state_dict[side + "_circle_radius"])):
                 
                 if self._get_line_distance_to_center(self.prev_main_circle_position, state_dict["main_circle_position"], state_dict[side + "_circle_position"]) < state_dict[side + "_circle_radius"]:
                     self.set_unsuccessful_trial(state_dict, side)
