@@ -117,7 +117,7 @@ if __name__ == "__main__":
             
             # update state dict
             if args.debug:
-                state_dict["marker_position"] = (np.array(list(pygame.mouse.get_pos()) + [0]) - np.array([interface.window_width / 2, 0.0, 0.0])) / 1000
+                state_dict["marker_position"] = (np.array(list(pygame.mouse.get_pos()) + [0]) - np.array([interface.window_width / 2, interface.window_height / 2, 0.0])) / 1000
             else:
                 state_dict["marker_position"] = state_dict["com"]
 
