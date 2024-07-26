@@ -101,7 +101,6 @@ def compute_com(markers, height_adjustment_ratio, weight_adjustment_ratio, plot=
     all_weights = np.array([torso_weight, pelvis_weight, thigh_weight, thigh_weight, shank_weight, shank_weight, foot_weight, foot_weight]).reshape(-1, 1)
     com = (all_coms * all_weights).sum(axis=0) / all_weights.sum()
 
-
     if plot:
         import matplotlib.pyplot as plt
         ax = plt.figure().add_subplot(projection='3d')

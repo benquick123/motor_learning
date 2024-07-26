@@ -151,8 +151,6 @@ if __name__ == "__main__":
             interface.update(state_dict)
             interface.draw()
             
-            print(np.round(state_dict["com"], 2), np.round(participant_com["com_offset"], 2), np.round(state_dict["cbos"], 2), end="\r")
-            
             # save current state to file
             logger.save_datapoint(state_dict)
             

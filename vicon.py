@@ -68,12 +68,10 @@ class ViconClient:
             # ^we are only interested in the three coordinates returned here.
             # we want the middle of the segment
             positions = np.array(segment_position[0]) / 1000
-            positions[0] *= -1
 
         elif mode == "marker":
             marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, name)
             positions = np.array(marker_position[0]) / 1000
-            positions[0] *= -1
         
         elif mode == "all_markers":
             marker_names = self.client.GetMarkerNames(self.subject_name)
@@ -84,7 +82,6 @@ class ViconClient:
                 marker_name = marker_name[0]
                 marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, marker_name)
                 positions[marker_name] = np.array(marker_position[0]) / 1000
-                positions[marker_name][0] *= -1
         
         return positions, time()
         
