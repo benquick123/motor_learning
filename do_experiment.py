@@ -58,6 +58,7 @@ def initialize_state_dict(state_dict, experiment_config, block_idx, total_blocks
     state_dict["weight_adjustment_ratio"] = experiment_config["participant"]["weight"] / NOMINAL_WEIGHT
 
     state_dict["needs_update"] = False
+    state_dict["cbos_set"] = False
     
     return state_dict
 
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     experiment_config = json.load(open("experiment_config.json", "r"))
     
     vicon_client = ViconClient(velocity_buffer_size=experiment_config["velocity_buffer_size"])
-    interface = Interface(display_number=1, main_circle_buffer_size=2)
+    interface = Interface(display_number=1)
     state_machine = StateMachine()
 
     logger = Logger(experiment_config["results_path"], experiment_config["participant"]["id"], no_log=args.no_log)
@@ -123,8 +124,10 @@ if __name__ == "__main__":
 
             state_dict["marker_velocity"] = marker_velocity
             state_dict["max_trial_velocity"] = max(state_dict["max_trial_velocity"], np.linalg.norm(marker_velocity))
-            if "cbos" not in state_dict:
+            if not state_dict["cbos_set"]:
                 state_dict["cbos"] = compute_cbos(state_dict)
+                if np.any(state_dict["cbos"] != 0):
+                    state_dict["cbos_set"] = True
                     
             # send data to motor controller
             state_dict["current_force_amplification"] = max(0, state_dict["current_force_amplification"] - state_dict["current_force_decay"])
@@ -137,9 +140,6 @@ if __name__ == "__main__":
                 print("Incorrect perturbation mode: " + str(state_dict["perturbation_mode"]))
                 raise NotImplementedError
             state_dict["motor_force"] = motor_force
-            
-            if np.abs(motor_force) > 0:
-                print(datetime.now(), "-", motor_force)
             
             controller.send_force(motor_force)
             
