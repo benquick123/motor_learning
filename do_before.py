@@ -122,11 +122,11 @@ if __name__ == "__main__":
 
     for key, value in positions.items():
         positions[key] = value.mean(axis=0).tolist()
-
+    
     positions["com_offset"] = np.array(positions["cop"]) - np.array(positions["com_approx"])
     positions["com_offset"][2] = 0
     positions["com_offset"] = positions["com_offset"].tolist()
-
+    
     print()
     print("COM offsets (x, y, z):")
     print(positions["com_offset"])
