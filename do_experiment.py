@@ -110,7 +110,7 @@ if __name__ == "__main__":
                 state_dict[marker_name] = marker_position
 
             state_dict["com_approx"] = compute_com(state_dict, state_dict["height_adjustment_ratio"], state_dict["weight_adjustment_ratio"])
-            state_dict["com"] = state_dict["com_approx"] - participant_com["com_offset"]
+            state_dict["com"] = state_dict["com_approx"] + participant_com["com_offset"]
             
             # calculate velocity
             state_dict["marker_timestamp"] = time()
