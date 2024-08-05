@@ -1,5 +1,5 @@
 import numpy as np
-
+from utils import set_axes_equal
 
 NOMINAL_WEIGHT = 77.9 # kg
 NOMINAL_TORSO_WEIGHT = 37.8264 # kg
@@ -64,11 +64,11 @@ def compute_com(markers, height_adjustment_ratio, weight_adjustment_ratio, plot=
     # obtain lower back marker position
     # assuming y axis is the one we are not interested in
     hip_distance = np.linalg.norm(markers["Upper_body_right_thigh"] - markers["Upper_body_left_thigh"])
-    lower_back_x = -lh2 * (markers["Upper_body_left_thigh"][2] - markers["Upper_body_right_thigh"][2]) / (hip_distance + (markers["Upper_body_left_thigh"][0] + markers["Upper_body_right_thigh"][0]) / 2 + 1e-8)
+    lower_back_x = lh2 * (markers["Upper_body_left_thigh"][2] - markers["Upper_body_right_thigh"][2]) / (hip_distance + (markers["Upper_body_left_thigh"][2] + markers["Upper_body_right_thigh"][2]) / 2 + 1e-8)
     lower_back_z = lh2 * (markers["Upper_body_left_thigh"][0] - markers["Upper_body_right_thigh"][0]) / (hip_distance + (markers["Upper_body_left_thigh"][2] + markers["Upper_body_right_thigh"][2]) / 2 + 1e-8)
     lower_back = midpoint.copy()
-    lower_back[0] = lower_back_x
-    lower_back[2] = lower_back_z
+    lower_back[0] += lower_back_x
+    lower_back[2] += lower_back_z
 
     # get COMs of all the lower body parts
     thigh_left_com_ratio = rhoc / (np.linalg.norm(knee_left - inner_thigh_left) + 1e-8)
@@ -149,6 +149,7 @@ def compute_com(markers, height_adjustment_ratio, weight_adjustment_ratio, plot=
         ax.text(com[0], com[1], com[2], "com", size=10, zorder=1, color='k')
 
         plt.tight_layout()
+        set_axes_equal(ax)
         plt.show()
         exit()
 
