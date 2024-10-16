@@ -9,7 +9,7 @@ import pygame
 import os
 
 from experiment_logging import Logger
-from vicon import ViconClient
+from vicon import ViconClient, MARKER_NAMES
 from controller import MotorController
 from interface import Interface
 from state_machine import StateMachine
@@ -106,7 +106,7 @@ if __name__ == "__main__":
             
             # get marker position
             positions = {}
-            for marker_name, marker_position in vicon_client.get_current_position(None, mode="all_markers")[0].items():
+            for marker_name, marker_position in vicon_client.get_current_position(None, mode=MARKER_NAMES)[0].items():
                 state_dict[marker_name] = marker_position
 
             state_dict["com_approx"] = compute_com(state_dict, state_dict["height_adjustment_ratio"], state_dict["weight_adjustment_ratio"])

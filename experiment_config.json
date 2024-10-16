@@ -2,11 +2,11 @@
     "results_path": "./trial_results",
     "participant": {
         "id": 998,
-        "height": 1.83,
-        "weight": 75,
-        "gender": "m",
-        "age": 23,
-        "name": "Rok"
+        "height": 1.65,
+        "weight": 60,
+        "gender": "f",
+        "age": 34,
+        "name": "Tjasa"
     },
     "experiment_pause_duration": 5,
     "experiment": [
@@ -20,7 +20,7 @@
             "force_direction": "forward",
             "force_mode": "none",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": [],
+            "channel_trial_idxs": [10, 20, 30, 40],
             "channel_amplification": 40.0
         },
         {
@@ -33,7 +33,7 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": [],
+            "channel_trial_idxs": [10, 20, 30, 40],
             "channel_amplification": 40.0
         },
         {
@@ -46,7 +46,7 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": [],
+            "channel_trial_idxs": [10, 20, 30, 40],
             "channel_amplification": 40.0
         },
         {
@@ -59,7 +59,7 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": [],
+            "channel_trial_idxs": [10, 20, 30, 40],
             "channel_amplification": 40.0
         },
         {
@@ -72,7 +72,7 @@
             "force_direction": "forward",
             "force_mode": "regular",
             "catch_trial_idxs": [19, 34],
-            "channel_trial_idxs": [],
+            "channel_trial_idxs": [10, 40],
             "channel_amplification": 40.0
         },
         {
@@ -85,7 +85,7 @@
             "force_direction": "forward",
             "force_mode": "none",
             "catch_trial_idxs": [],
-            "channel_trial_idxs": [],
+            "channel_trial_idxs": [10, 20, 30, 40],
             "channel_amplification": 40.0
         }
     ],
