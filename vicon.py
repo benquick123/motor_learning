@@ -8,6 +8,19 @@ import numpy as np
 from vicon_dssdk import ViconDataStream
 
 
+MARKER_NAMES = [
+    "Left_foot2",
+    "Left_foot3",
+    "Left_foot_heel",
+    "Right_foot2",
+    "Right_foot3",
+    "Right_foot_heel",
+    "Upper_body_left_thigh",
+    "Upper_body_neck",
+    "Upper_body_right_thigh"
+]
+
+
 class ViconClient:
     
     def __init__(self, subject_name="WholeBodyLearningExp", address="localhost", port=801, velocity_buffer_size=5):
@@ -53,7 +66,7 @@ class ViconClient:
         return bool(self._is_recording.value)
     
     def get_current_position(self, name, mode="segment"):
-        assert mode in {"segment", "marker", "all_markers"}
+        assert mode in {"segment", "marker", "all_markers"} or isinstance(mode, list), "Mode must be {segment, marker, all_markers}, or a list of marker names."
         
         has_frame = False
         while not has_frame:
@@ -80,6 +93,11 @@ class ViconClient:
             positions = dict()
             for marker_name in marker_names:
                 marker_name = marker_name[0]
+                marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, marker_name)
+                positions[marker_name] = np.array(marker_position[0]) / 1000
+        
+        elif isinstance(mode, list):
+            for marker_name in mode:
                 marker_position = self.client.GetMarkerGlobalTranslation(self.subject_name, marker_name)
                 positions[marker_name] = np.array(marker_position[0]) / 1000
         

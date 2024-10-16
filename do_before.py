@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 
-from vicon import ViconClient
+from vicon import ViconClient, MARKER_NAMES
 from experiment_logging import Logger
 from com_computation import compute_com, create_marker_dict, NOMINAL_HEIGHT, NOMINAL_WEIGHT
 
@@ -27,7 +27,7 @@ def record(total_time, vicon_client, frequency=100):
     positions = defaultdict(list)
     while (time() - recording_start) < total_time:
         time_start = time()
-        for marker_name, position in vicon_client.get_current_position(None, mode="all_markers")[0].items():
+        for marker_name, position in vicon_client.get_current_position(None, mode=MARKER_NAMES)[0].items():
             positions[marker_name].append(position)
 
         positions["cop"].append(vicon_client.get_center_of_pressure())
@@ -122,11 +122,11 @@ if __name__ == "__main__":
 
     for key, value in positions.items():
         positions[key] = value.mean(axis=0).tolist()
-    
+
     positions["com_offset"] = np.array(positions["cop"]) - np.array(positions["com_approx"])
-    positions["com_offset"][2] = positions["com_offset"][0] = 0
+    positions["com_offset"][2] = 0
     positions["com_offset"] = positions["com_offset"].tolist()
-    
+
     print()
     print("COM offsets (x, y, z):")
     print(positions["com_offset"])
